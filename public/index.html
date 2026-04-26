@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>街の戦闘力</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a12;color:#fff;font-family:'Helvetica Neue',sans-serif;height:100vh;display:flex;flex-direction:column}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:#0d0d1a;border-bottom:1px solid #1e1e3a;z-index:1000}
+.logo-main{font-size:20px;font-weight:900;letter-spacing:2px}
+.logo-sub{font-size:10px;color:#888;margin-left:8px}
+#map{flex:1}
+#info-panel{position:absolute;bottom:20px;right:20px;background:rgba(13,13,26,0.95);border:1px solid #1e1e3a;border-radius:12px;padding:16px;min-width:220px;z-index:1000;display:none}
+.rank-badge{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;margin-bottom:8px}
+.legend{position:absolute;bottom:20px;left:20px;background:rgba(13,13,26,0.92);border:1px solid #1e1e3a;border-radius:8px;padding:10px 14px;z-index:1000}
+.legend-item{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px}
+.legend-dot{width:12px;height:12px;border-radius:50%}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <span class="logo-main">街の戦闘力</span>
+    <span class="logo-sub">Commercial Power Index</span>
+  </div>
+  <select id="radiusSelect" style="background:#1a1a2e;color:#fff;border:1px solid #333;padding:4px 8px;border-radius:6px">
+    <option value="500">半径500m</option>
+    <option value="800" selected>半径800m</option>
+    <option value="1000">半径1000m</option>
+    <option value="1500">半径1500m</option>
+  </select>
+</header>
+<div id="map"></div>
+<div class="legend">
+  <div style="font-size:10px;color:#888;margin-bottom:5px">戦闘力ランク</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ffd700"></div>S 800〜1000</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ff3b3b"></div>A 600〜799</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ff7c2a"></div>B 400〜599</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f5c842"></div>C 200〜399</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#5bc4f5"></div>D 100〜199</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#888"></div>E 0〜99</div>
+</div>
+<div id="info-panel">
+  <div id="station-name" style="font-weight:900;font-size:16px;margin-bottom:4px"></div>
+  <div id="station-score" style="font-size:28px;font-weight:900;margin-bottom:8px"></div>
+  <div id="station-detail" style="font-size:12px;color:#aaa"></div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const RANKS={
+  S:{color:'#ffd700',min:800},
+  A:{color:'#ff3b3b',min:600},
+  B:{color:'#ff7c2a',min:400},
+  C:{color:'#f5c842',min:200},
+  D:{color:'#5bc4f5',min:100},
+  E:{color:'#888888',min:0}
+};
+
+function getRank(score){
+  for(const[r,v] of Object.entries(RANKS)){
+    if(score>=v.min)return{rank:r,color:v.color};
+  }
+  return{rank:'E',color:'#888'};
+}
+
+const map=L.map('map').setView([35.6812,139.7671],12);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'©OpenStreetMap ©Carto'}).addTo(map);
+
+const STATIONS=[
+  {name:'新宿',lat:35.6896,lng:139.7006},
+  {name:'渋谷',lat:35.6580,lng:139.7016},
+  {name:'池袋',lat:35.7295,lng:139.7109},
+  {name:'東京',lat:35.6812,lng:139.7671},
+  {name:'品川',lat:35.6284,lng:139.7387},
+  {name:'上野',lat:35.7141,lng:139.7774},
+  {name:'秋葉原',lat:35.6984,lng:139.7731},
+  {name:'横浜',lat:35.4658,lng:139.6223},
+  {name:'武蔵小杉',lat:35.5754,lng:139.6567},
+  {name:'吉祥寺',lat:35.7027,lng:139.5796}
+];
+
+async function loadStation(station){
+  const radius=document.getElementById('radiusSelect').value;
+  try{
+    const res=await fetch(`/api/places?ll=${station.lat},${station.lng}&radius=${radius}`);
+    const data=await res.json();
+    const count=data.results?data.results.length:0;
+    const score=Math.min(1000,count*18);
+    drawMarker(station,score);
+  }catch(e){
+    drawMarker(station,0);
+  }
+}
+
+function drawMarker(station,score){
+  const{rank,color}=getRank(score);
+  const size=Math.max(30,Math.min(70,20+score/20));
+  const icon=L.divIcon({
+    className:'',
+    html:`<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color}22;border:2px solid ${color};display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer">
+      <span style="font-weight:900;font-size:${size*0.28}px;color:${color}">${score}</span>
+      <span style="font-size:${size*0.18}px;color:#fff;opacity:0.8">${rank}</span>
+    </div>`,
+    iconSize:[size,size],
+    iconAnchor:[size/2,size/2]
+  });
+  const marker=L.marker([station.lat,station.lng],{icon}).addTo(map);
+  marker.on('click',()=>{
+    document.getElementById('info-panel').style.display='block';
+    document.getElementById('station-name').textContent=station.name+'駅';
+    document.getElementById('station-score').style.color=getRank(score).color;
+    document.getElementById('station-score').textContent=score+'点 ('+getRank(score).rank+'ランク)';
+    document.getElementById('station-detail').textContent='半径'+document.getElementById('radiusSelect').value+'m圏内の商業施設スコア';
+  });
+}
+
+STATIONS.forEach(loadStation);
+document.getElementById('radiusSelect').addEventListener('change',()=>{
+  map.eachLayer(l=>{if(l instanceof L.Marker)map.removeLayer(l);});
+  STATIONS.forEach(loadStation);
+});
+</script>
+</body>
+</html>
