@@ -7,66 +7,91 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a12;color:#fff;font-family:'Helvetica Neue',sans-serif;height:100vh;display:flex;flex-direction:column}
-header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:#0d0d1a;border-bottom:1px solid #1e1e3a;z-index:1000}
-.logo-main{font-size:20px;font-weight:900;letter-spacing:2px}
-.logo-sub{font-size:10px;color:#888;margin-left:8px}
-#map{flex:1}
-#info-panel{position:absolute;bottom:20px;right:20px;background:rgba(13,13,26,0.95);border:1px solid #1e1e3a;border-radius:12px;padding:16px;min-width:220px;z-index:1000;display:none}
-.rank-badge{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;margin-bottom:8px}
-.legend{position:absolute;bottom:20px;left:20px;background:rgba(13,13,26,0.92);border:1px solid #1e1e3a;border-radius:8px;padding:10px 14px;z-index:1000}
-.legend-item{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px}
-.legend-dot{width:12px;height:12px;border-radius:50%}
+html,body{height:100%;background:#080810;color:#fff;font-family:'Helvetica Neue',Arial,sans-serif;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh}
+#header{display:flex;justify-content:space-between;align-items:center;padding:10px 18px;background:#0d0d1a;border-bottom:1px solid #1e1e3a;z-index:2000;flex-shrink:0}
+.logo-main{font-size:18px;font-weight:900;letter-spacing:3px}
+.logo-sub{font-size:9px;color:#7a7a9a;margin-left:8px;letter-spacing:2px;text-transform:uppercase}
+.controls{display:flex;align-items:center;gap:10px}
+.ctrl{background:#1a1a2e;color:#fff;border:1px solid #1e1e3a;padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer}
+.view-toggle{display:flex;border:1px solid #1e1e3a;border-radius:6px;overflow:hidden}
+.tbtn{background:transparent;color:#7a7a9a;border:none;padding:5px 14px;font-size:12px;cursor:pointer}
+.tbtn.active{background:#2a2a4a;color:#fff}
+#content{flex:1;position:relative;overflow:hidden}
+#map-area{position:absolute;inset:0}
+#leaflet-map{position:absolute;inset:0}
+#table-view{position:absolute;inset:0;overflow-y:auto;padding:4px 0;display:none;background:#080810}
+.leaflet-container{background:#080810!important}
+.leaflet-tile-pane{filter:brightness(0.38) saturate(0.3) hue-rotate(200deg)}
+#legend{position:absolute;bottom:20px;left:16px;z-index:1000;background:rgba(8,8,16,0.93);border:1px solid #1e1e3a;border-radius:8px;padding:10px 14px}
+.leg-title{font-size:9px;color:#7a7a9a;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px}
+.leg-item{display:flex;align-items:center;gap:7px;margin-bottom:3px;font-size:11px;color:#bbb}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+#info-panel{position:absolute;bottom:20px;right:16px;z-index:1000;background:rgba(8,8,16,0.95);border:1px solid #1e1e3a;border-radius:12px;padding:16px 18px;min-width:190px;display:none}
+.info-name{font-size:15px;font-weight:900;margin-bottom:2px}
+.info-score{font-size:38px;font-weight:900;line-height:1;margin-bottom:10px}
+.info-row{display:flex;justify-content:space-between;font-size:11px;color:#7a7a9a;padding:2px 0}
+.info-row span:last-child{color:#ccc}
+.rank-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid #1a1a2a;cursor:pointer}
+.rank-row:hover{background:#0f0f20}
+.rn{color:#555;font-size:12px;width:22px;text-align:right}
+.rbadge{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;flex-shrink:0}
+.rname{flex:1;font-size:14px;font-weight:700}
+.rscore{font-size:20px;font-weight:900}
 </style>
 </head>
 <body>
-<header>
-  <div>
-    <span class="logo-main">街の戦闘力</span>
-    <span class="logo-sub">Commercial Power Index</span>
+<div id="app">
+  <div id="header">
+    <div>
+      <span class="logo-main">街の戦闘力</span>
+      <span class="logo-sub">Commercial Power Index</span>
+    </div>
+    <div class="controls">
+      <select class="ctrl" id="radiusSelect">
+        <option value="500">半径 500m</option>
+        <option value="800" selected>半径 800m</option>
+        <option value="1000">半径 1,000m</option>
+        <option value="1500">半径 1,500m</option>
+      </select>
+      <div class="view-toggle">
+        <button class="tbtn active" id="btnMap" onclick="setView('map')">🗺 MAP</button>
+        <button class="tbtn" id="btnTable" onclick="setView('table')">📊 ランキング</button>
+      </div>
+    </div>
   </div>
-  <select id="radiusSelect" style="background:#1a1a2e;color:#fff;border:1px solid #333;padding:4px 8px;border-radius:6px">
-    <option value="500">半径500m</option>
-    <option value="800" selected>半径800m</option>
-    <option value="1000">半径1000m</option>
-    <option value="1500">半径1500m</option>
-  </select>
-</header>
-<div id="map"></div>
-<div class="legend">
-  <div style="font-size:10px;color:#888;margin-bottom:5px">戦闘力ランク</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#ffd700"></div>S 800〜1000</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#ff3b3b"></div>A 600〜799</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#ff7c2a"></div>B 400〜599</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#f5c842"></div>C 200〜399</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#5bc4f5"></div>D 100〜199</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#888"></div>E 0〜99</div>
-</div>
-<div id="info-panel">
-  <div id="station-name" style="font-weight:900;font-size:16px;margin-bottom:4px"></div>
-  <div id="station-score" style="font-size:28px;font-weight:900;margin-bottom:8px"></div>
-  <div id="station-detail" style="font-size:12px;color:#aaa"></div>
+  <div id="content">
+    <div id="map-area">
+      <div id="leaflet-map"></div>
+      <div id="legend">
+        <div class="leg-title">戦闘力ランク</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#ffd700"></div>S　800〜1000</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#ff3b3b"></div>A　600〜799</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#ff7c2a"></div>B　400〜599</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#f5c842"></div>C　200〜399</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#5bc4f5"></div>D　100〜199</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#888899"></div>E　0〜99</div>
+      </div>
+      <div id="info-panel">
+        <div id="info-name" class="info-name"></div>
+        <div id="info-score" class="info-score"></div>
+        <div id="info-cats"></div>
+      </div>
+    </div>
+    <div id="table-view"></div>
+  </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const RANKS={
-  S:{color:'#ffd700',min:800},
-  A:{color:'#ff3b3b',min:600},
-  B:{color:'#ff7c2a',min:400},
-  C:{color:'#f5c842',min:200},
-  D:{color:'#5bc4f5',min:100},
-  E:{color:'#888888',min:0}
-};
-
-function getRank(score){
-  for(const[r,v] of Object.entries(RANKS)){
-    if(score>=v.min)return{rank:r,color:v.color};
-  }
-  return{rank:'E',color:'#888'};
-}
-
-const map=L.map('map').setView([35.6812,139.7671],12);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'©OpenStreetMap ©Carto'}).addTo(map);
+const RANKS=[
+  {rank:'S',color:'#ffd700',min:800},
+  {rank:'A',color:'#ff3b3b',min:600},
+  {rank:'B',color:'#ff7c2a',min:400},
+  {rank:'C',color:'#f5c842',min:200},
+  {rank:'D',color:'#5bc4f5',min:100},
+  {rank:'E',color:'#888899',min:0}
+];
+function getRank(s){return RANKS.find(r=>s>=r.min)||RANKS[5]}
 
 const STATIONS=[
   {name:'新宿',lat:35.6896,lng:139.7006},
@@ -81,46 +106,94 @@ const STATIONS=[
   {name:'吉祥寺',lat:35.7027,lng:139.5796}
 ];
 
-async function loadStation(station){
+const lmap=L.map('leaflet-map',{zoomControl:true}).setView([35.658,139.7016],11);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'©OpenStreetMap ©Carto',maxZoom:19}).addTo(lmap);
+
+let stationData=[],markers=[];
+
+async function loadStation(st){
   const radius=document.getElementById('radiusSelect').value;
   try{
-    const res=await fetch(`/api/places?ll=${station.lat},${station.lng}&radius=${radius}`);
+    const res=await fetch(`/api/score?ll=${st.lat},${st.lng}&radius=${radius}`);
     const data=await res.json();
-    const count=data.results?data.results.length:0;
-    const score=Math.min(1000,count*18);
-    drawMarker(station,score);
-  }catch(e){
-    drawMarker(station,0);
-  }
+    return{...st,score:data.score||0,details:data.details||{}};
+  }catch{return{...st,score:0,details:{}};}
 }
 
-function drawMarker(station,score){
-  const{rank,color}=getRank(score);
-  const size=Math.max(30,Math.min(70,20+score/20));
-  const icon=L.divIcon({
-    className:'',
-    html:`<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color}22;border:2px solid ${color};display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer">
-      <span style="font-weight:900;font-size:${size*0.28}px;color:${color}">${score}</span>
-      <span style="font-size:${size*0.18}px;color:#fff;opacity:0.8">${rank}</span>
-    </div>`,
-    iconSize:[size,size],
-    iconAnchor:[size/2,size/2]
-  });
-  const marker=L.marker([station.lat,station.lng],{icon}).addTo(map);
-  marker.on('click',()=>{
-    document.getElementById('info-panel').style.display='block';
-    document.getElementById('station-name').textContent=station.name+'駅';
-    document.getElementById('station-score').style.color=getRank(score).color;
-    document.getElementById('station-score').textContent=score+'点 ('+getRank(score).rank+'ランク)';
-    document.getElementById('station-detail').textContent='半径'+document.getElementById('radiusSelect').value+'m圏内の商業施設スコア';
+function drawMarker(st){
+  const{rank,color}=getRank(st.score);
+  const sz=Math.round(28+(st.score/1000)*52);
+  const sf=Math.round(sz*0.3);
+  const rf=Math.round(sz*0.2);
+  const nf=Math.max(9,Math.round(sz*0.16));
+  const glow=Math.round(sz*0.35);
+  const html=`<div style="display:flex;flex-direction:column;align-items:center">
+    <div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${color}1a;border:2px solid ${color};box-shadow:0 0 ${glow}px ${color}55;display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <span style="font-weight:900;font-size:${sf}px;color:#fff;line-height:1.1">${st.score}</span>
+      <span style="font-weight:700;font-size:${rf}px;color:${color};line-height:1">${rank}</span>
+    </div>
+    <span style="font-size:${nf}px;color:rgba(255,255,255,0.8);white-space:nowrap;margin-top:3px;text-shadow:0 1px 4px #000">${st.name}</span>
+  </div>`;
+  const icon=L.divIcon({className:'',html,iconSize:[sz+60,sz+24],iconAnchor:[(sz+60)/2,sz/2]});
+  const m=L.marker([st.lat,st.lng],{icon}).addTo(lmap);
+  m.on('click',()=>showInfo(st));
+  markers.push(m);
+}
+
+function showInfo(st){
+  const{color}=getRank(st.score);
+  document.getElementById('info-name').textContent=st.name+'駅';
+  const el=document.getElementById('info-score');
+  el.textContent=st.score+'点';
+  el.style.color=color;
+  document.getElementById('info-cats').innerHTML=
+    Object.entries(st.details).map(([k,v])=>`<div class="info-row"><span>${k}</span><span>${v}件</span></div>`).join('');
+  document.getElementById('info-panel').style.display='block';
+}
+
+function clearMarkers(){markers.forEach(m=>lmap.removeLayer(m));markers=[];}
+
+function updateTable(){
+  const sorted=[...stationData].sort((a,b)=>b.score-a.score);
+  document.getElementById('table-view').innerHTML=sorted.map((st,i)=>{
+    const{rank,color}=getRank(st.score);
+    return`<div class="rank-row" data-name="${st.name}">
+      <span class="rn">${i+1}</span>
+      <div class="rbadge" style="background:${color}22;border:2px solid ${color};color:${color}">${rank}</div>
+      <span class="rname">${st.name}駅</span>
+      <span class="rscore" style="color:${color}">${st.score}</span>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.rank-row').forEach(row=>{
+    row.addEventListener('click',()=>{
+      const st=stationData.find(s=>s.name===row.dataset.name);
+      if(!st)return;
+      setView('map');
+      lmap.setView([st.lat,st.lng],13);
+      showInfo(st);
+    });
   });
 }
 
-STATIONS.forEach(loadStation);
-document.getElementById('radiusSelect').addEventListener('change',()=>{
-  map.eachLayer(l=>{if(l instanceof L.Marker)map.removeLayer(l);});
-  STATIONS.forEach(loadStation);
-});
+async function loadAll(){
+  clearMarkers();
+  document.getElementById('info-panel').style.display='none';
+  stationData=await Promise.all(STATIONS.map(loadStation));
+  stationData.forEach(drawMarker);
+  updateTable();
+}
+
+function setView(v){
+  document.getElementById('btnMap').classList.toggle('active',v==='map');
+  document.getElementById('btnTable').classList.toggle('active',v==='table');
+  document.getElementById('map-area').style.display=v==='map'?'block':'none';
+  document.getElementById('table-view').style.display=v==='table'?'block':'none';
+  if(v==='map')lmap.invalidateSize();
+}
+
+lmap.on('click',()=>{document.getElementById('info-panel').style.display='none';});
+document.getElementById('radiusSelect').addEventListener('change',loadAll);
+loadAll();
 </script>
 </body>
 </html>
