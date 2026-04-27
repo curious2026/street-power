@@ -17,11 +17,12 @@ const CATS = [
 
 async function fetchCount(ll, radius, categoryId, apiKey) {
   try {
-    var url = 'https://api.foursquare.com/v3/places/search?ll=' + ll + '&radius=' + radius + '&categories=' + categoryId + '&limit=50';
+    var url = 'https://places-api.foursquare.com/places/search?ll=' + ll + '&radius=' + radius + '&categories=' + categoryId + '&limit=50';
     var r = await fetch(url, {
       headers: {
-        'Authorization': apiKey,
-        'Accept': 'application/json'
+        'Authorization': 'Bearer ' + apiKey,
+        'Accept': 'application/json',
+        'X-Places-Api-Version': '2025-04-27'
       }
     });
     var d = await r.json();
@@ -35,15 +36,11 @@ app.get('/api/score', async function(req, res) {
   var ll = req.query.ll;
   var radius = req.query.radius || 800;
   var apiKey = process.env.FSQ_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'APIキー未設定', score: 0, details: {} });
-  }
+  if (!apiKey) return res.status(500).json({ error: 'APIキー未設定', score: 0, details: {} });
   try {
-    var counts = await Promise.all(
-      CATS.map(function(cat) {
-        return fetchCount(ll, radius, cat.id, apiKey);
-      })
-    );
+    var counts = await Promise.all(CATS.map(function(cat) {
+      return fetchCount(ll, radius, cat.id, apiKey);
+    }));
     var details = {};
     var raw = 0;
     for (var i = 0; i < CATS.length; i++) {
@@ -60,11 +57,12 @@ app.get('/api/test', async function(req, res) {
   var apiKey = process.env.FSQ_API_KEY;
   if (!apiKey) return res.json({ ok: false, error: 'APIキーなし' });
   try {
-    var url = 'https://api.foursquare.com/v3/places/search?ll=35.6896,139.7006&radius=800&limit=10';
+    var url = 'https://places-api.foursquare.com/places/search?ll=35.6896,139.7006&radius=800&limit=10';
     var r = await fetch(url, {
       headers: {
-        'Authorization': apiKey,
-        'Accept': 'application/json'
+        'Authorization': 'Bearer ' + apiKey,
+        'Accept': 'application/json',
+        'X-Places-Api-Version': '2025-04-27'
       }
     });
     var d = await r.json();
