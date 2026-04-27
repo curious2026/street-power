@@ -7,16 +7,6 @@ const app = express();
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const FSQ_BASE = 'https://places-api.foursquare.com/places/search';
-
-function fsqHeaders(apiKey) {
-  return {
-    'Authorization': 'Bearer ' + apiKey,
-    'Accept': 'application/json',
-    'X-Places-Api-Version': '2025-01-01'
-  };
-}
-
 const CATS = [
   { id: '13000', label: '飲食', weight: 30 },
   { id: '17000', label: 'ショッピング', weight: 25 },
@@ -27,8 +17,13 @@ const CATS = [
 
 async function fetchCount(ll, radius, categoryId, apiKey) {
   try {
-    var url = FSQ_BASE + '?ll=' + ll + '&radius=' + radius + '&categories=' + categoryId + '&limit=50';
-    var r = await fetch(url, { headers: fsqHeaders(apiKey) });
+    var url = 'https://api.foursquare.com/v3/places/search?ll=' + ll + '&radius=' + radius + '&categories=' + categoryId + '&limit=50';
+    var r = await fetch(url, {
+      headers: {
+        'Authorization': apiKey,
+        'Accept': 'application/json'
+      }
+    });
     var d = await r.json();
     return (d.results || []).length;
   } catch(e) {
@@ -63,12 +58,15 @@ app.get('/api/score', async function(req, res) {
 
 app.get('/api/test', async function(req, res) {
   var apiKey = process.env.FSQ_API_KEY;
-  if (!apiKey) {
-    return res.json({ ok: false, error: 'APIキーなし' });
-  }
+  if (!apiKey) return res.json({ ok: false, error: 'APIキーなし' });
   try {
-    var url = FSQ_BASE + '?ll=35.6896,139.7006&radius=800&limit=10';
-    var r = await fetch(url, { headers: fsqHeaders(apiKey) });
+    var url = 'https://api.foursquare.com/v3/places/search?ll=35.6896,139.7006&radius=800&limit=10';
+    var r = await fetch(url, {
+      headers: {
+        'Authorization': apiKey,
+        'Accept': 'application/json'
+      }
+    });
     var d = await r.json();
     res.json({ ok: true, status: r.status, count: (d.results || []).length, sample: d });
   } catch(e) {
