@@ -8,24 +8,24 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const FSQ_BASE = 'https://places-api.foursquare.com/places/search';
+const FSQ_HEADERS = (apiKey) => ({
+  'Authorization': `Bearer ${apiKey}`,
+  'Accept': 'application/json',
+  'X-Foursquare-API-Version': '20240101'
+});
 
 const CATS = [
-  { id: '13000', label: '飲食',         weight: 30 },
-  { id: '17000', label: 'ショッピング',  weight: 25 },
-  { id: '15000', label: '生活サービス',  weight: 20 },
-  { id: '11000', label: 'ビジネス',      weight: 15 },
-  { id: '10000', label: 'エンタメ',      weight: 10 },
+  { id: '13000', label: '飲食',        weight: 30 },
+  { id: '17000', label: 'ショッピング', weight: 25 },
+  { id: '15000', label: '生活サービス', weight: 20 },
+  { id: '11000', label: 'ビジネス',     weight: 15 },
+  { id: '10000', label: 'エンタメ',     weight: 10 },
 ];
 
 async function fetchCount(ll, radius, categoryId, apiKey) {
   try {
     const url = `${FSQ_BASE}?ll=${ll}&radius=${radius}&categories=${categoryId}&limit=50`;
-    const r = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Accept': 'application/json'
-      }
-    });
+    const r = await fetch(url, { headers: FSQ_HEADERS(apiKey) });
     const d = await r.json();
     return (d.results || []).length;
   } catch { return 0; }
@@ -57,18 +57,4 @@ app.get('/api/test', async (req, res) => {
   if (!apiKey) return res.json({ ok: false, error: 'APIキーなし' });
   try {
     const url = `${FSQ_BASE}?ll=35.6896,139.7006&radius=800&limit=10`;
-    const r = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Accept': 'application/json'
-      }
-    });
-    const d = await r.json();
-    res.json({ ok: true, status: r.status, count: (d.results||[]).length, sample: d });
-  } catch(e) {
-    res.json({ ok: false, error: e.message });
-  }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    const r = awai
