@@ -3,90 +3,150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>街の戦闘力</title>
+<title>街の戦闘力 - Commercial Power Index</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;background:#080810;color:#fff;font-family:'Helvetica Neue',Arial,sans-serif}
+html,body{height:100%;background:#080c14;color:#e8eaf0;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif}
 #app{display:flex;flex-direction:column;height:100vh}
-#header{display:flex;justify-content:space-between;align-items:center;padding:0 16px;height:48px;background:#0d0d1a;border-bottom:1px solid #1e1e3a;z-index:2000;flex-shrink:0;gap:10px}
-.logo{display:flex;align-items:baseline;gap:8px;cursor:pointer}
-.logo-main{font-size:17px;font-weight:900;letter-spacing:3px;color:#fff}
-.logo-sub{font-size:8px;color:#5a5a7a;letter-spacing:2px;text-transform:uppercase}
-.hcontrols{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.hbtn{background:#1a1a2e;color:#aaa;border:1px solid #2a2a4a;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap}
-.hbtn:hover{background:#2a2a4a;color:#fff}
-.hbtn.active{background:#2a2a5a;color:#fff;border-color:#4a4aaa}
-select.hsel{background:#1a1a2e;color:#ccc;border:1px solid #2a2a4a;padding:5px 8px;border-radius:6px;font-size:11px;cursor:pointer}
-#filters{display:flex;align-items:center;gap:8px;padding:7px 16px;background:#0a0a18;border-bottom:1px solid #1a1a2a;flex-shrink:0;overflow-x:auto}
-.flabel{font-size:10px;color:#5a5a7a;white-space:nowrap}
+
+/* ヘッダー */
+#header{display:flex;align-items:center;justify-content:space-between;padding:0 18px;height:50px;
+  background:linear-gradient(135deg,#0d1020 0%,#12162a 100%);
+  border-bottom:1px solid #1e2340;z-index:2000;flex-shrink:0;gap:12px}
+.logo{display:flex;align-items:baseline;gap:9px;cursor:pointer;text-decoration:none}
+.logo-main{font-size:18px;font-weight:900;letter-spacing:3px;color:#fff;
+  background:linear-gradient(90deg,#fff 60%,#aab0cc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-badge{font-size:9px;color:#5a6080;letter-spacing:1.5px;text-transform:uppercase;
+  border:1px solid #2a3050;padding:2px 7px;border-radius:10px;cursor:pointer;
+  -webkit-text-fill-color:#5a6080;transition:all 0.2s}
+.logo-badge:hover{border-color:#4a5080;color:#9ab0ff;-webkit-text-fill-color:#9ab0ff}
+.hcontrols{display:flex;align-items:center;gap:8px}
+.hsel{background:#0d1020;color:#c0c8e0;border:1px solid #1e2340;
+  padding:5px 10px;border-radius:7px;font-size:12px;cursor:pointer;outline:none}
+.hsel:focus{border-color:#4a5080}
+.view-tabs{display:flex;border:1px solid #1e2340;border-radius:8px;overflow:hidden}
+.vtab{background:transparent;color:#6a7090;border:none;padding:6px 14px;
+  font-size:12px;cursor:pointer;transition:all 0.15s;letter-spacing:0.5px}
+.vtab.active{background:#1e2440;color:#fff}
+.vtab:hover:not(.active){background:#131828;color:#c0c8e0}
+
+/* フィルターバー */
+#filters{display:flex;align-items:center;gap:8px;padding:7px 18px;
+  background:#0a0e1c;border-bottom:1px solid #14182a;flex-shrink:0;overflow-x:auto}
+.flabel{font-size:10px;color:#3a4060;white-space:nowrap;letter-spacing:1px;text-transform:uppercase}
+#statusbar{margin-left:auto;font-size:10px;color:#3a4060;white-space:nowrap}
+#statusbar.loading-anim{color:#5a70ff;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}
+
+/* コンテンツ */
 #content{flex:1;position:relative;overflow:hidden}
-#map-area{position:absolute;inset:0}
+#map-area{position:absolute;inset:0;visibility:visible}
 #leaflet-map{width:100%;height:100%}
-.leaflet-container{background:#080810!important}
-.leaflet-tile-pane{filter:brightness(0.45) saturate(0.25) hue-rotate(210deg)}
-#table-area{position:absolute;inset:0;overflow-y:auto;background:#080810;display:none}
-#legend{position:absolute;bottom:20px;left:14px;z-index:1000;background:rgba(8,8,18,0.94);border:1px solid #1e1e3a;border-radius:8px;padding:10px 13px}
-.leg-title{font-size:9px;color:#5a5a7a;letter-spacing:2px;margin-bottom:6px}
-.leg-item{display:flex;align-items:center;gap:7px;margin-bottom:3px;font-size:10px;color:#aaa}
-.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-#info-panel{position:absolute;bottom:20px;right:14px;z-index:1000;background:rgba(8,8,18,0.97);border:1px solid #1e1e3a;border-radius:12px;padding:16px;min-width:200px;max-width:240px;display:none}
-.ip-name{font-size:15px;font-weight:900;margin-bottom:2px}
-.ip-line{font-size:10px;color:#5a5a7a;margin-bottom:8px}
-.ip-score{font-size:42px;font-weight:900;line-height:1;margin-bottom:4px}
-.ip-rank{font-size:12px;font-weight:700;margin-bottom:10px}
-.ip-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #1a1a2a;font-size:11px}
-.ip-row:last-child{border:none}
-.ip-row-label{color:#7a7a9a}
-.ip-bar-wrap{flex:1;margin:0 8px;height:3px;background:#1a1a2a;border-radius:2px}
-.ip-bar{height:3px;border-radius:2px}
-.ip-pts{color:#fff;font-weight:700;font-size:11px}
-#loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3000;text-align:center;color:#5a5a7a;pointer-events:none}
-.ld-spinner{width:32px;height:32px;border:3px solid #1a1a2a;border-top-color:#5a5aaa;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px}
+.leaflet-container{background:#080c14!important}
+.leaflet-tile-pane{filter:brightness(0.42) saturate(0.22) hue-rotate(215deg)}
+.leaflet-control-zoom a{background:#0d1020!important;color:#8090b0!important;border-color:#1e2340!important}
+.leaflet-control-zoom a:hover{background:#1e2440!important;color:#fff!important}
+
+#table-area{position:absolute;inset:0;overflow-y:auto;background:#080c14;display:none}
+
+/* 凡例 */
+#legend{position:absolute;bottom:22px;left:14px;z-index:1000;
+  background:rgba(8,12,20,0.94);border:1px solid #1e2340;
+  border-radius:10px;padding:11px 14px;backdrop-filter:blur(8px)}
+.leg-title{font-size:9px;color:#3a4060;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.leg-item{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:10px;color:#9098b0}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* 詳細パネル */
+#info-panel{position:absolute;bottom:22px;right:14px;z-index:1000;
+  background:rgba(8,12,20,0.97);border:1px solid #1e2340;
+  border-radius:12px;padding:18px;min-width:210px;max-width:250px;
+  display:none;backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.ip-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.ip-name{font-size:16px;font-weight:900;color:#fff}
+.ip-line{font-size:10px;color:#3a4060;margin-top:2px;line-height:1.4}
+.ip-close{background:none;border:none;color:#3a4060;font-size:16px;cursor:pointer;padding:0;line-height:1}
+.ip-close:hover{color:#fff}
+.ip-score-wrap{margin-bottom:14px}
+.ip-score{font-size:46px;font-weight:900;line-height:1;letter-spacing:-1px}
+.ip-rank-label{font-size:11px;font-weight:700;margin-top:2px;letter-spacing:1px}
+.ip-axis{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.ip-axis-label{font-size:10px;color:#5a6080;width:60px;flex-shrink:0;white-space:nowrap}
+.ip-bar-track{flex:1;height:4px;background:#14182a;border-radius:2px;overflow:hidden}
+.ip-bar-fill{height:4px;border-radius:2px;transition:width 0.5s ease}
+.ip-pts{font-size:10px;font-weight:700;width:36px;text-align:right;flex-shrink:0}
+
+/* ローディング */
+#loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:3000;text-align:center;color:#3a4060;pointer-events:none}
+.ld-ring{width:36px;height:36px;border:2px solid #14182a;border-top-color:#4a5aff;
+  border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 10px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.rank-row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid #0f0f20;cursor:pointer}
-.rank-row:hover{background:#0d0d22}
-.rn{color:#3a3a5a;font-size:11px;width:20px;text-align:right;flex-shrink:0}
-.rbadge{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0}
+
+/* ランキング */
+.rank-row{display:flex;align-items:center;gap:11px;padding:12px 18px;
+  border-bottom:1px solid #0d1020;cursor:pointer;transition:background 0.1s}
+.rank-row:hover{background:#0d1020}
+.rn{color:#2a3050;font-size:11px;width:22px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
+.rbadge{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-weight:900;font-size:12px;flex-shrink:0}
 .rinfo{flex:1;min-width:0}
-.rname{font-size:13px;font-weight:700;color:#fff}
-.rline{font-size:9px;color:#5a5a7a;margin-top:1px}
-.rscore{font-size:20px;font-weight:900;flex-shrink:0}
+.rname{font-size:13px;font-weight:700;color:#e8eaf0}
+.rline{font-size:9px;color:#3a4060;margin-top:1px}
+.rcats{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.rcat{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700}
+.rscore{font-size:22px;font-weight:900;flex-shrink:0;font-variant-numeric:tabular-nums;letter-spacing:-0.5px}
+
 /* モーダル */
-#modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:5000;display:none;align-items:center;justify-content:center}
+#modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:5000;
+  display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 #modal-bg.open{display:flex}
-#modal{background:#0d0d1a;border:1px solid #2a2a4a;border-radius:14px;padding:22px;width:320px;max-height:80vh;overflow-y:auto}
-.modal-title{font-size:15px;font-weight:900;margin-bottom:4px}
-.modal-sub{font-size:11px;color:#5a5a7a;margin-bottom:16px;line-height:1.5}
-.modal-axis{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:9px 11px;background:#080810;border-radius:8px}
-.modal-pt-badge{width:38px;height:38px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;flex-shrink:0}
-.modal-axis-name{font-weight:700;font-size:12px}
-.modal-axis-desc{font-size:10px;color:#5a5a7a;margin-top:1px}
-.modal-note{font-size:10px;color:#3a3a5a;margin-top:12px;line-height:1.6}
+#modal{background:#0d1020;border:1px solid #1e2340;border-radius:16px;
+  padding:24px;width:340px;max-height:85vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,0.7)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.modal-title{font-size:16px;font-weight:900;color:#fff}
+.modal-close{background:none;border:none;color:#3a4060;font-size:20px;cursor:pointer}
+.modal-close:hover{color:#fff}
+.modal-desc{font-size:11px;color:#5a6080;margin-bottom:20px;line-height:1.7}
+.modal-axis{display:flex;align-items:center;gap:12px;margin-bottom:12px;
+  padding:11px 13px;background:#080c14;border-radius:10px;border:1px solid #14182a}
+.modal-pt{width:42px;height:42px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-weight:900;font-size:15px;color:#fff;flex-shrink:0}
+.modal-axis-name{font-weight:700;font-size:12px;color:#e8eaf0}
+.modal-axis-desc{font-size:10px;color:#5a6080;margin-top:2px}
+.modal-note{font-size:10px;color:#2a3050;margin-top:16px;line-height:1.8;
+  border-top:1px solid #14182a;padding-top:12px}
 </style>
 </head>
 <body>
 <div id="app">
   <div id="header">
-    <div class="logo" onclick="openModal()">
-      <span class="logo-main">街の戦闘力</span>
-      <span class="logo-sub">Commercial Power Index ⓘ</span>
+    <div>
+      <div class="logo" onclick="openModal()">
+        <span class="logo-main">街の戦闘力</span>
+        <span class="logo-badge">スコアの見方 ⓘ</span>
+      </div>
     </div>
     <div class="hcontrols">
       <select class="hsel" id="radiusSelect">
-        <option value="500">500m</option>
-        <option value="800" selected>800m</option>
-        <option value="1000">1,000m</option>
-        <option value="1500">1,500m</option>
+        <option value="500">半径 500m</option>
+        <option value="800" selected>半径 800m</option>
+        <option value="1000">半径 1,000m</option>
+        <option value="1500">半径 1,500m</option>
       </select>
-      <button class="hbtn active" id="btnMap" onclick="setView('map')">🗺 MAP</button>
-      <button class="hbtn" id="btnTable" onclick="setView('table')">📊 ランキング</button>
+      <div class="view-tabs">
+        <button class="vtab active" id="btnMap" onclick="setView('map')">🗺 MAP</button>
+        <button class="vtab" id="btnTable" onclick="setView('table')">📊 ランキング</button>
+      </div>
     </div>
   </div>
+
   <div id="filters">
-    <span class="flabel">絞り込み：</span>
+    <span class="flabel">絞り込み</span>
     <select class="hsel" id="prefSelect" onchange="onPrefChange()">
-      <option value="">全都県</option>
+      <option value="">全エリア</option>
       <option value="東京都">東京都</option>
       <option value="神奈川県">神奈川県</option>
       <option value="埼玉県">埼玉県</option>
@@ -95,34 +155,38 @@ select.hsel{background:#1a1a2e;color:#ccc;border:1px solid #2a2a4a;padding:5px 8
     <select class="hsel" id="lineSelect" onchange="render()">
       <option value="">全路線</option>
     </select>
+    <span id="statusbar">読み込み中...</span>
   </div>
+
   <div id="content">
     <div id="map-area">
       <div id="leaflet-map"></div>
       <div id="legend">
         <div class="leg-title">戦闘力ランク</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#ffd700;box-shadow:0 0 6px #ffd700"></div>S　800〜1000</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#ffd700;box-shadow:0 0 8px #ffd70099"></div>S　800〜1000</div>
         <div class="leg-item"><div class="leg-dot" style="background:#ff4444"></div>A　600〜799</div>
         <div class="leg-item"><div class="leg-dot" style="background:#ff8c00"></div>B　400〜599</div>
         <div class="leg-item"><div class="leg-dot" style="background:#44aaff"></div>C　200〜399</div>
         <div class="leg-item"><div class="leg-dot" style="background:#44cc88"></div>D　100〜199</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#556677"></div>E　0〜99</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#445566"></div>E　0〜99</div>
       </div>
       <div id="info-panel">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="ip-head">
           <div>
             <div class="ip-name" id="ip-name"></div>
             <div class="ip-line" id="ip-line"></div>
           </div>
-          <button onclick="document.getElementById('info-panel').style.display='none'" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:2px">✕</button>
+          <button class="ip-close" onclick="document.getElementById('info-panel').style.display='none'">✕</button>
         </div>
-        <div id="ip-score" class="ip-score"></div>
-        <div id="ip-rank" class="ip-rank"></div>
-        <div id="ip-details"></div>
+        <div class="ip-score-wrap">
+          <div class="ip-score" id="ip-score"></div>
+          <div class="ip-rank-label" id="ip-rank"></div>
+        </div>
+        <div id="ip-axes"></div>
       </div>
       <div id="loading">
-        <div class="ld-spinner"></div>
-        <div style="font-size:12px">データ読み込み中...</div>
+        <div class="ld-ring"></div>
+        <div style="font-size:11px">データ取得中...</div>
       </div>
     </div>
     <div id="table-area"></div>
@@ -132,106 +196,127 @@ select.hsel{background:#1a1a2e;color:#ccc;border:1px solid #2a2a4a;padding:5px 8
 <!-- スコア説明モーダル -->
 <div id="modal-bg" onclick="closeModal()">
   <div id="modal" onclick="event.stopPropagation()">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div class="modal-title">戦闘力スコアとは</div>
-      <button onclick="closeModal()" style="background:none;border:none;color:#555;font-size:18px;cursor:pointer">✕</button>
+    <div class="modal-header">
+      <div class="modal-title">戦闘力スコアの算出方法</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-    <div class="modal-sub">駅から半径800m（デフォルト）圏内の商業施設データをもとに、1000点満点で「街の商業的な強さ」を数値化したものです。</div>
-    <div class="modal-axis"><div class="modal-pt-badge" style="background:#ff4060">300</div><div><div class="modal-axis-name">飲食充実</div><div class="modal-axis-desc">飲食店・カフェ・バーなどの数</div></div></div>
-    <div class="modal-axis"><div class="modal-pt-badge" style="background:#4a9fd4">200</div><div><div class="modal-axis-name">生活利便</div><div class="modal-axis-desc">コンビニ・スーパー・薬局・銀行など</div></div></div>
-    <div class="modal-axis"><div class="modal-pt-badge" style="background:#9b7fe8">150</div><div><div class="modal-axis-name">ビジネス集積</div><div class="modal-axis-desc">オフィス・ホテル・法人施設など</div></div></div>
-    <div class="modal-axis"><div class="modal-pt-badge" style="background:#2e9e60">100</div><div><div class="modal-axis-name">商業多様性</div><div class="modal-axis-desc">施設カテゴリの種類数（多様性）</div></div></div>
-    <div class="modal-axis"><div class="modal-pt-badge" style="background:#f09000">100</div><div><div class="modal-axis-name">医療・福祉</div><div class="modal-axis-desc">病院・クリニック・薬局など</div></div></div>
-    <div class="modal-axis"><div class="modal-pt-badge" style="background:#556677">150</div><div><div class="modal-axis-name">総合ボーナス</div><div class="modal-axis-desc">圏内施設の総数に基づくボーナス</div></div></div>
-    <div class="modal-note">※ 対数スケールで計算するため、施設数が多いほど得点が上がりますが上限があります。<br>※ データは Overture Maps（Meta・Microsoft等提供）を使用。</div>
+    <div class="modal-desc">
+      各駅から指定半径（デフォルト800m）圏内の商業施設データをもとに、<strong style="color:#e8eaf0">1000点満点</strong>で「その街の商業的な強さ」を数値化しています。<br>
+      データソース：<strong style="color:#9ab0ff">Overture Maps</strong>（Meta・Microsoft・Amazon等が提供するオープンデータ）
+    </div>
+    <div class="modal-axis">
+      <div class="modal-pt" style="background:#ff4060">400</div>
+      <div>
+        <div class="modal-axis-name">飲食充実</div>
+        <div class="modal-axis-desc">飲食店・カフェ・バー・ファストフードなどの施設数<br>目安：1,800件で満点（新宿レベル）</div>
+      </div>
+    </div>
+    <div class="modal-axis">
+      <div class="modal-pt" style="background:#4a9fd4">300</div>
+      <div>
+        <div class="modal-axis-name">生活利便</div>
+        <div class="modal-axis-desc">コンビニ・スーパー・薬局・銀行・美容院など日常生活施設<br>目安：450件で満点</div>
+      </div>
+    </div>
+    <div class="modal-axis">
+      <div class="modal-pt" style="background:#9b7fe8">200</div>
+      <div>
+        <div class="modal-axis-name">商業・小売</div>
+        <div class="modal-axis-desc">百貨店・ショッピング・アパレル・ホテル・娯楽施設など<br>目安：350件で満点</div>
+      </div>
+    </div>
+    <div class="modal-axis">
+      <div class="modal-pt" style="background:#f09000">100</div>
+      <div>
+        <div class="modal-axis-name">医療・福祉</div>
+        <div class="modal-axis-desc">病院・クリニック・歯科・調剤薬局など医療施設<br>目安：150件で満点</div>
+      </div>
+    </div>
+    <div class="modal-note">
+      ※ 各軸は「目安件数で満点」のリニアスケールで計算。目安を超えても上限値でキャップされます。<br>
+      ※ Overture Maps データは月次更新。スコアは各月の更新後に自動反映されます。<br>
+      ※ 本スコアは商業施設密度のみを反映しており、居住環境・治安・家賃等は含みません。
+    </div>
   </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+// ── ランク定義 ─────────────────────────────────────────
 const RANKS=[
-  {rank:'S',color:'#ffd700',glow:'#ffd70066',min:800},
+  {rank:'S',color:'#ffd700',glow:'#ffd70055',min:800},
   {rank:'A',color:'#ff4444',glow:'#ff444433',min:600},
   {rank:'B',color:'#ff8c00',glow:'#ff8c0033',min:400},
   {rank:'C',color:'#44aaff',glow:'#44aaff33',min:200},
   {rank:'D',color:'#44cc88',glow:'#44cc8833',min:100},
-  {rank:'E',color:'#556677',glow:'#55667733',min:0}
+  {rank:'E',color:'#445566',glow:'#44556633',min:0}
 ];
-function getRank(s){return RANKS.find(r=>s>=r.min)||RANKS[5]}
+function getRank(s){return RANKS.find(r=>s>=r.min)||RANKS[5];}
 
-// ── 路線データ ──────────────────────────────────────────
-const LINE_DATA = {
-  '東京都': {
+// ── 路線・駅データ ──────────────────────────────────────
+const LINE_DATA={
+  '東京都':{
     'JR山手線':['東京','有楽町','新橋','浜松町','田町','品川','大崎','五反田','目黒','恵比寿','渋谷','原宿','代々木','新宿','新大久保','高田馬場','目白','池袋','大塚','巣鴨','駒込','田端','西日暮里','日暮里','鶯谷','上野','御徒町','秋葉原','神田'],
     'JR中央線':['東京','神田','御茶ノ水','四ツ谷','新宿','中野','高円寺','阿佐ケ谷','荻窪','西荻窪','吉祥寺','三鷹','武蔵境','東小金井','武蔵小金井','国分寺','西国分寺','国立','立川','日野','豊田','八王子'],
-    'JR総武線':['東京','秋葉原','浅草橋','両国','錦糸町','亀戸','平井','新小岩','小岩','市川'],
-    'JR京浜東北線':['東京','有楽町','新橋','浜松町','田町','品川','大井町','大森','蒲田'],
+    'JR総武線':['秋葉原','浅草橋','両国','錦糸町','亀戸','平井','新小岩','小岩'],
+    'JR京浜東北線':['田端','上中里','王子','東十条','赤羽','蒲田','大森','大井町'],
     '東京メトロ銀座線':['渋谷','表参道','青山一丁目','赤坂見附','溜池山王','虎ノ門','新橋','銀座','京橋','日本橋','三越前','神田','末広町','上野広小路','上野','稲荷町','田原町','浅草'],
-    '東京メトロ丸ノ内線':['池袋','新大塚','茗荷谷','後楽園','本郷三丁目','御茶ノ水','淡路町','大手町','東京','銀座','霞ケ関','国会議事堂前','赤坂見附','四ツ谷','四谷三丁目','新宿御苑前','新宿三丁目','新宿','西新宿','中野坂上','東高円寺','新中野','方南町'],
+    '東京メトロ丸ノ内線':['池袋','新大塚','茗荷谷','後楽園','本郷三丁目','御茶ノ水','淡路町','大手町','東京','銀座','霞ケ関','国会議事堂前','赤坂見附','四ツ谷','四谷三丁目','新宿御苑前','新宿三丁目','新宿','西新宿','中野坂上'],
     '東京メトロ日比谷線':['中目黒','恵比寿','広尾','六本木','神谷町','霞ケ関','日比谷','銀座','東銀座','築地','八丁堀','茅場町','人形町','小伝馬町','秋葉原','仲御徒町','上野','入谷','三ノ輪','南千住','北千住'],
-    '東京メトロ東西線':['中野','落合','高田馬場','早稲田','神楽坂','飯田橋','九段下','竹橋','大手町','日本橋','茅場町','門前仲町','木場','東陽町','南砂町','西葛西','葛西','浦安','南行徳','行徳','妙典','原木中山','西船橋'],
-    '東京メトロ千代田線':['代々木上原','代々木公園','明治神宮前','表参道','乃木坂','赤坂','国会議事堂前','霞ケ関','日比谷','二重橋前','大手町','新御茶ノ水','湯島','根津','千駄木','西日暮里','町屋','北千住','綾瀬','北綾瀬'],
+    '東京メトロ東西線':['中野','落合','高田馬場','早稲田','神楽坂','飯田橋','九段下','竹橋','大手町','日本橋','茅場町','門前仲町','木場','東陽町','南砂町','西葛西','葛西'],
+    '東京メトロ千代田線':['代々木上原','代々木公園','明治神宮前','表参道','乃木坂','赤坂','国会議事堂前','霞ケ関','日比谷','二重橋前','大手町','新御茶ノ水','湯島','根津','千駄木','西日暮里','町屋','北千住'],
     '東京メトロ有楽町線':['和光市','地下鉄成増','地下鉄赤塚','平和台','氷川台','小竹向原','千川','要町','池袋','東池袋','護国寺','江戸川橋','飯田橋','市ケ谷','麹町','永田町','桜田門','有楽町','銀座一丁目','新富町','月島','豊洲','辰巳','新木場'],
     '東京メトロ半蔵門線':['渋谷','表参道','青山一丁目','永田町','半蔵門','九段下','神保町','大手町','三越前','水天宮前','清澄白河','住吉','錦糸町','押上'],
-    '東京メトロ南北線':['目黒','白金台','白金高輪','麻布十番','六本木一丁目','溜池山王','永田町','四ツ谷','市ケ谷','飯田橋','後楽園','東大前','本駒込','駒込','西ケ原','王子','王子神谷','志茂','赤羽岩淵'],
+    '東京メトロ南北線':['目黒','白金台','白金高輪','麻布十番','六本木一丁目','溜池山王','永田町','四ツ谷','市ケ谷','飯田橋','後楽園','東大前','本駒込','駒込','西ケ原','王子','赤羽岩淵'],
     '東京メトロ副都心線':['渋谷','明治神宮前','北参道','西新宿五丁目','新宿三丁目','東新宿','西早稲田','雑司が谷','池袋','要町','千川','小竹向原','新桜台','練馬'],
     '都営浅草線':['西馬込','馬込','中延','戸越','五反田','高輪台','泉岳寺','三田','大門','新橋','東銀座','宝町','日本橋','人形町','東日本橋','浅草橋','蔵前','浅草','本所吾妻橋','押上'],
-    '都営三田線':['目黒','白金台','白金高輪','三田','芝公園','御成門','内幸町','日比谷','大手町','神保町','水道橋','春日','白山','千石','巣鴨','西巣鴨','新板橋','板橋区役所前','板橋本町','本蓮沼','志村坂上','志村三丁目','蓮根','西台','高島平','新高島平','西高島平'],
+    '都営三田線':['目黒','白金台','白金高輪','三田','芝公園','御成門','内幸町','日比谷','大手町','神保町','水道橋','春日','白山','千石','巣鴨','西巣鴨','新板橋','板橋区役所前','板橋本町','本蓮沼','志村坂上','志村三丁目','蓮根','西台','高島平'],
     '都営新宿線':['新宿','新宿三丁目','曙橋','市ケ谷','九段下','神保町','小川町','岩本町','馬喰横山','浜町','森下','菊川','住吉','西大島','大島','東大島','船堀','一之江','瑞江','篠崎','本八幡'],
-    '都営大江戸線':['新宿','都庁前','西新宿五丁目','中野坂上','東中野','中井','落合南長崎','新江古田','練馬','豊島園','練馬春日町','光が丘','新宿西口','国際展示場正門','汐留','大門','赤羽橋','麻布十番','六本木','青山一丁目','国立競技場','代々木','新宿'],
-    '京王線':['新宿','笹塚','代田橋','明大前','下高井戸','桜上水','上北沢','八幡山','芦花公園','千歳烏山','仙川','つつじヶ丘','柴崎','国領','布田','調布','西調布','飛田給','武蔵野台','多磨霊園','東府中','府中','分倍河原','中河原','聖蹟桜ヶ丘','百草園','高幡不動','南平','平山城址公園','長沼','北野','京王八王子'],
-    '小田急小田原線':['新宿','南新宿','参宮橋','代々木八幡','代々木上原','東北沢','下北沢','世田谷代田','梅ヶ丘','豪徳寺','経堂','千歳船橋','祖師ヶ谷大蔵','成城学園前','喜多見','狛江','和泉多摩川','登戸','向ヶ丘遊園','生田','読売ランド前','百合ヶ丘','新百合ヶ丘'],
+    '都営大江戸線':['新宿','都庁前','西新宿五丁目','中野坂上','東中野','中井','落合南長崎','新江古田','練馬','豊島園','練馬春日町','光が丘','汐留','大門','赤羽橋','麻布十番','六本木','青山一丁目','国立競技場','代々木'],
+    '京王線':['新宿','笹塚','代田橋','明大前','下高井戸','桜上水','上北沢','八幡山','芦花公園','千歳烏山','仙川','つつじヶ丘','柴崎','国領','布田','調布','西調布','飛田給','武蔵野台','多磨霊園','東府中','府中','分倍河原','中河原','聖蹟桜ヶ丘','高幡不動','北野','京王八王子'],
+    '小田急小田原線':['新宿','南新宿','参宮橋','代々木八幡','代々木上原','東北沢','下北沢','世田谷代田','梅ヶ丘','豪徳寺','経堂','千歳船橋','祖師ヶ谷大蔵','成城学園前','喜多見','狛江','和泉多摩川','登戸','向ヶ丘遊園','百合ヶ丘','新百合ヶ丘'],
     '東急東横線':['渋谷','代官山','中目黒','祐天寺','学芸大学','都立大学','自由が丘','田園調布','多摩川','新丸子','武蔵小杉','元住吉','日吉','綱島','大倉山','菊名','妙蓮寺','白楽','東白楽','反町','横浜'],
-    '東急田園都市線':['渋谷','池尻大橋','三軒茶屋','駒沢大学','桜新町','用賀','二子玉川','二子新地','高津','溝の口','梶が谷','宮崎台','宮前平','鷺沼','たまプラーザ','あざみ野','江田','市が尾','藤が丘','青葉台','田奈','長津田'],
+    '東急田園都市線':['渋谷','池尻大橋','三軒茶屋','駒沢大学','桜新町','用賀','二子玉川','溝の口','梶が谷','宮崎台','宮前平','鷺沼','たまプラーザ','あざみ野','江田','市が尾','藤が丘','青葉台','長津田'],
     '東急目黒線':['目黒','不動前','武蔵小山','西小山','洗足','大岡山','奥沢','田園調布','多摩川','新丸子','武蔵小杉','日吉'],
     '西武池袋線':['池袋','椎名町','東長崎','江古田','桜台','練馬','中村橋','富士見台','練馬高野台','石神井公園','大泉学園','保谷','ひばりが丘','東久留米','清瀬','秋津','所沢'],
     '東武東上線':['池袋','北池袋','下板橋','大山','中板橋','ときわ台','上板橋','東武練馬','下赤塚','成増','和光市','朝霞','朝霞台','志木','柳瀬川','みずほ台','鶴瀬','ふじみ野','上福岡','新河岸','川越'],
-    '京急本線':['品川','北品川','新馬場','青物横丁','鮫洲','立会川','大森海岸','平和島','大森町','梅屋敷','京急蒲田','糀谷','雑色','六郷土手','京急川崎']
-  },
-  '神奈川県': {
-    'JR東海道線':['横浜','戸塚','大船','藤沢','辻堂','茅ケ崎','平塚','大磯','二宮','国府津','鴨宮','小田原'],
-    '東急東横線':['横浜'],
-    '横浜市営ブルーライン':['あざみ野','新羽','北新横浜','新横浜','岸根公園','片倉町','三ツ沢上町','三ツ沢下町','横浜','高島町','桜木町','関内','伊勢佐木長者町','阪東橋','吉野町','蒔田','弘明寺','上大岡','港南中央','上永谷','下永谷','舞台野','戸塚','踊場','中田','立場','下飯田','湘南台'],
-    '横浜市営グリーンライン':['日吉','日吉本町','高田','東山田','中山','川和町','都筑ふれあいの丘','センター南','センター北','北山田','東山田','高田','日吉'],
-    '相鉄本線':['横浜','平沼橋','西横浜','天王町','星川','和田町','上星川','西谷','鶴ケ峰','二俣川','希望ケ丘','三ツ境','瀬谷','大和','相模大塚','さがみ野','かしわ台','海老名'],
-    '小田急江ノ島線':['相模大野','東林間','中央林間','南林間','鶴間','大和','桜ケ丘','高座渋谷','長後','湘南台','六会日大前','善行','藤沢本町','藤沢','本鵠沼','鵠沼海岸','片瀬江ノ島']
-  },
-  '埼玉県': {
-    'JR京浜東北線':['浦和','北浦和','与野','さいたま新都心','大宮','土呂','東大宮','蓮田','白岡','新白岡','久喜'],
-    'JR埼京線':['大宮','北与野','与野本町','武蔵浦和','中浦和','南与野','北赤羽'],
-    '東武伊勢崎線':['北千住','小菅','五反野','梅島','西新井','竹ノ塚','谷塚','草加','獨協大学前','新田','蒲生','新越谷','越谷','北越谷','大袋','せんげん台','武里','一ノ割','春日部'],
     '西武新宿線':['西武新宿','高田馬場','下落合','中井','新井薬師前','沼袋','野方','都立家政','鷺ノ宮','下井草','井荻','上井草','上石神井','武蔵関','東伏見','西武柳沢','田無','花小金井','小平','久米川','東村山','所沢']
   },
-  '千葉県': {
-    'JR総武線':['市川','本八幡','下総中山','西船橋','船橋','東船橋','津田沼','幕張本郷','幕張','新検見川','稲毛','西千葉','千葉'],
-    'JR京葉線':['新木場','葛西臨海公園','舞浜','新浦安','市川塩浜','二俣新町','南船橋','海浜幕張','検見川浜','稲毛海岸','千葉みなと','蘇我'],
+  '神奈川県':{
+    'JR東海道線':['横浜','戸塚','大船','藤沢','辻堂','茅ケ崎','平塚','小田原'],
+    '横浜市営ブルーライン':['あざみ野','新横浜','横浜','桜木町','関内','伊勢佐木長者町','上大岡','戸塚','湘南台'],
+    '相鉄本線':['横浜','天王町','星川','和田町','上星川','西谷','鶴ケ峰','二俣川','希望ケ丘','三ツ境','瀬谷','大和','海老名'],
+    '小田急江ノ島線':['相模大野','中央林間','南林間','鶴間','大和','桜ケ丘','高座渋谷','長後','湘南台','藤沢','片瀬江ノ島'],
+    '京急本線':['品川','北品川','新馬場','青物横丁','鮫洲','立会川','大森海岸','平和島','大森町','梅屋敷','京急蒲田','六郷土手','川崎']
+  },
+  '埼玉県':{
+    'JR京浜東北線':['さいたま新都心','大宮','土呂','東大宮','蓮田','久喜'],
+    'JR埼京線':['大宮','北与野','与野本町','武蔵浦和','中浦和','南与野'],
+    '東武伊勢崎線':['北千住','小菅','五反野','梅島','西新井','竹ノ塚','谷塚','草加','新越谷','越谷','北越谷','せんげん台','武里','春日部'],
+    '東武東上線':['和光市','朝霞','朝霞台','志木','川越']
+  },
+  '千葉県':{
+    'JR総武線':['市川','本八幡','下総中山','西船橋','船橋','津田沼','幕張本郷','幕張','新検見川','稲毛','西千葉','千葉'],
+    'JR京葉線':['新木場','葛西臨海公園','舞浜','新浦安','南船橋','海浜幕張','稲毛海岸','千葉みなと','蘇我'],
     '東京メトロ東西線':['浦安','南行徳','行徳','妙典','原木中山','西船橋'],
-    '京成本線':['日暮里','新三河島','町屋','千住大橋','京成関屋','堀切菖蒲園','お花茶屋','青砥','京成高砂','京成小岩','江戸川','京成国府台','京成市川','鬼越','京成中山','東中山','京成西船','海神','京成船橋','大神宮下','船橋競馬場','谷津','京成津田沼','京成幕張本郷','京成幕張','京成稲毛','みどり台','西登戸','新千葉','京成千葉','千葉中央']
+    '京成本線':['日暮里','京成高砂','京成船橋','谷津','京成津田沼','京成幕張本郷','京成稲毛','京成千葉','千葉中央']
   }
 };
 
-// 全駅フラット化
-const ALL_STATIONS = [];
-Object.entries(LINE_DATA).forEach(([pref, lines]) => {
-  Object.entries(lines).forEach(([line, stations]) => {
-    stations.forEach(name => {
-      if (!ALL_STATIONS.find(s => s.name === name && s.line === line)) {
-        ALL_STATIONS.push({ name, line, pref });
-      }
+// 重複除去して駅リスト生成
+const STATIONS_MAP={};
+Object.entries(LINE_DATA).forEach(([pref,lines])=>{
+  Object.entries(lines).forEach(([line,stations])=>{
+    stations.forEach(name=>{
+      const key=name+'_'+pref;
+      if(!STATIONS_MAP[key]) STATIONS_MAP[key]={name,pref,lines:[]};
+      if(!STATIONS_MAP[key].lines.includes(line)) STATIONS_MAP[key].lines.push(line);
     });
   });
 });
 
-// 重複除去（同名駅は路線を合算）
-const STATIONS_MAP = {};
-ALL_STATIONS.forEach(s => {
-  const key = s.name + '_' + s.pref;
-  if (!STATIONS_MAP[key]) STATIONS_MAP[key] = { name: s.name, pref: s.pref, lines: [], score: null, details: null };
-  if (!STATIONS_MAP[key].lines.includes(s.line)) STATIONS_MAP[key].lines.push(s.line);
-});
-
-// 緯度経度データ（主要駅）
-const COORDS = {
+// 緯度経度データ
+const COORDS={
   '新宿':[35.6896,139.7006],'渋谷':[35.6580,139.7016],'池袋':[35.7295,139.7109],
   '東京':[35.6812,139.7671],'品川':[35.6284,139.7387],'上野':[35.7141,139.7774],
   '秋葉原':[35.6984,139.7731],'横浜':[35.4658,139.6223],'武蔵小杉':[35.5754,139.6567],
@@ -295,190 +380,353 @@ const COORDS = {
   '中井':[35.7124,139.6837],'野方':[35.7201,139.6548],'所沢':[35.7993,139.4689],
   '成増':[35.7695,139.6388],'和光市':[35.7833,139.6076],'朝霞':[35.7895,139.5978],
   '志木':[35.8394,139.5802],'川越':[35.9248,139.4858],'大宮':[35.9067,139.6237],
-  '浦和':[35.8585,139.6439],'さいたま新都心':[35.8940,139.6294],'北浦和':[35.8686,139.6379],
-  '草加':[35.8247,139.8059],'春日部':[35.9741,139.7526],'越谷':[35.8872,139.7957],
-  '市川':[35.7223,139.9219],'本八幡':[35.7147,139.9144],'西船橋':[35.7075,139.9437],
-  '船橋':[35.6984,139.9825],'津田沼':[35.6814,140.0182],'幕張本郷':[35.6644,140.0378],
-  '海浜幕張':[35.6497,140.0434],'稲毛':[35.6542,140.1019],'千葉':[35.6132,140.1122],
-  '新浦安':[35.6527,139.9028],'舞浜':[35.6321,139.8798],'葛西臨海公園':[35.6427,139.8609],
-  '蒲田':[35.5627,139.7165],'大森':[35.5963,139.7346],'川崎':[35.5308,139.7016],
-  '戸塚':[35.3980,139.5362],'大船':[35.3386,139.5325],'藤沢':[35.3381,139.4892],
-  '茅ケ崎':[35.3319,139.4030],'平塚':[35.3264,139.3529],'小田原':[35.2563,139.1550],
-  '海老名':[35.4476,139.3928],'大和':[35.4720,139.4624],'相模大野':[35.5494,139.4441],
-  '湘南台':[35.4168,139.4834],'片瀬江ノ島':[35.3012,139.4880],'長津田':[35.5351,139.4993],
-  '青葉台':[35.5453,139.5148],'たまプラーザ':[35.5605,139.5607],'二子新地':[35.6072,139.6216],
-  '高津':[35.5957,139.6162],'宮崎台':[35.5816,139.5893],'鷺沼':[35.5745,139.5748],
-  '市が尾':[35.5545,139.5396],'江田':[35.5459,139.5252]
+  'さいたま新都心':[35.8940,139.6294],'草加':[35.8247,139.8059],'春日部':[35.9741,139.7526],
+  '越谷':[35.8872,139.7957],'市川':[35.7223,139.9219],'本八幡':[35.7147,139.9144],
+  '西船橋':[35.7075,139.9437],'船橋':[35.6984,139.9825],'津田沼':[35.6814,140.0182],
+  '幕張本郷':[35.6644,140.0378],'海浜幕張':[35.6497,140.0434],'稲毛':[35.6542,140.1019],
+  '千葉':[35.6132,140.1122],'新浦安':[35.6527,139.9028],'舞浜':[35.6321,139.8798],
+  '葛西臨海公園':[35.6427,139.8609],'蒲田':[35.5627,139.7165],'大森':[35.5963,139.7346],
+  '川崎':[35.5308,139.7016],'戸塚':[35.3980,139.5362],'大船':[35.3386,139.5325],
+  '藤沢':[35.3381,139.4892],'茅ケ崎':[35.3319,139.4030],'平塚':[35.3264,139.3529],
+  '小田原':[35.2563,139.1550],'海老名':[35.4476,139.3928],'大和':[35.4720,139.4624],
+  '相模大野':[35.5494,139.4441],'湘南台':[35.4168,139.4834],'片瀬江ノ島':[35.3012,139.4880],
+  '長津田':[35.5351,139.4993],'青葉台':[35.5453,139.5148],'江田':[35.5459,139.5252],
+  '市が尾':[35.5545,139.5396],'上大岡':[35.3993,139.5937],'新横浜':[35.5083,139.6157],
+  '桜木町':[35.4505,139.6317],'関内':[35.4436,139.6381],'新木場':[35.6477,139.8216],
+  '北千住':[35.7490,139.8000],'王子':[35.7375,139.7375],'赤羽':[35.7779,139.7208],
+  '大井町':[35.6028,139.7282],'西大島':[35.7009,139.8303],'大島':[35.7054,139.8370],
+  '西武柳沢':[35.7406,139.5678],'田無':[35.7408,139.5404],'花小金井':[35.7453,139.5087],
+  '小平':[35.7219,139.4778],'久米川':[35.7526,139.4641],'東村山':[35.7551,139.4688],
+  '一之江':[35.7081,139.8819],'瑞江':[35.7019,139.8913],'篠崎':[35.7080,139.9044],
+  '本八幡':[35.7147,139.9144],'高島平':[35.7749,139.6740],'蓮根':[35.7687,139.6817],
+  '西台':[35.7645,139.6886],'志村三丁目':[35.7619,139.6943],'志村坂上':[35.7564,139.6994],
+  '本蓮沼':[35.7526,139.7061],'板橋本町':[35.7482,139.7060],'板橋区役所前':[35.7429,139.7096],
+  '新板橋':[35.7392,139.7186],'白山':[35.7267,139.7492],'千石':[35.7313,139.7441],
+  '護国寺':[35.7186,139.7337],'東池袋':[35.7278,139.7199],'地下鉄成増':[35.7695,139.6388],
+  '地下鉄赤塚':[35.7741,139.6449],'平和台':[35.7757,139.6574],'氷川台':[35.7744,139.6695],
+  '小竹向原':[35.7378,139.6856],'千川':[35.7348,139.6950],'要町':[35.7306,139.7002],
+  '光が丘':[35.7608,139.6210],'練馬春日町':[35.7573,139.6307],'豊島園':[35.7411,139.6598],
+  '練馬':[35.7357,139.6530],'新桜台':[35.7344,139.6588],'椎名町':[35.7193,139.6836],
+  '東長崎':[35.7255,139.6761],'江古田':[35.7319,139.6677],'桜台':[35.7338,139.6614],
+  '中村橋':[35.7308,139.6402],'富士見台':[35.7296,139.6313],'練馬高野台':[35.7337,139.6220],
+  '石神井公園':[35.7356,139.6076],'大泉学園':[35.7450,139.5818],'保谷':[35.7498,139.5649],
+  'ひばりが丘':[35.7475,139.5352],'東久留米':[35.7607,139.5247],'清瀬':[35.7851,139.5157],
+  '秋津':[35.7886,139.4874],'椎名町':[35.7193,139.6836],'新大塚':[35.7190,139.7278],
+  '茗荷谷':[35.7166,139.7335],'落合':[35.7057,139.6862],'早稲田':[35.7082,139.7191],
+  '神楽坂':[35.7043,139.7412],'竹橋':[35.6903,139.7551],'西葛西':[35.6665,139.8702],
+  '葛西':[35.6678,139.8821],'浦安':[35.6619,139.8969],'南行徳':[35.6700,139.9134],
+  '行徳':[35.6773,139.9240],'妙典':[35.6868,139.9360],'原木中山':[35.6981,139.9470],
+  '根津':[35.7211,139.7625],'千駄木':[35.7255,139.7617],'町屋':[35.7380,139.7784],
+  '湯島':[35.7099,139.7697],'新御茶ノ水':[35.6985,139.7663],'赤坂':[35.6722,139.7369],
+  '北参道':[35.6745,139.7052],'桜田門':[35.6793,139.7528],'銀座一丁目':[35.6727,139.7674],
+  '白金台':[35.6430,139.7257],'白金高輪':[35.6430,139.7394],'六本木一丁目':[35.6636,139.7366],
+  '西ケ原':[35.7396,139.7455],'王子神谷':[35.7449,139.7358],'志茂':[35.7583,139.7230],
+  '赤羽岩淵':[35.7796,139.7227],'西大島':[35.7009,139.8303],'東大島':[35.6921,139.8397],
+  '船堀':[35.7091,139.9016],'泉岳寺':[35.6404,139.7418],'高輪台':[35.6359,139.7283],
+  '馬込':[35.5958,139.7157],'西馬込':[35.5937,139.7093],'中延':[35.6090,139.7148],
+  '戸越':[35.6166,139.7221],'東日本橋':[35.6889,139.7850],'本所吾妻橋':[35.7091,139.8028],
+  '曙橋':[35.6893,139.7255],'西新宿五丁目':[35.6950,139.6916],'中野坂上':[35.7005,139.6734],
+  '東中野':[35.7075,139.6793],'落合南長崎':[35.7129,139.6796],'新江古田':[35.7217,139.6645],
+  '汐留':[35.6645,139.7569],'赤羽橋':[35.6494,139.7368],'国立競技場':[35.6634,139.7141],
+  '都庁前':[35.6892,139.6924],'北池袋':[35.7344,139.7124],'下板橋':[35.7362,139.7160],
+  '大山':[35.7401,139.7191],'中板橋':[35.7441,139.7239],'ときわ台':[35.7492,139.7198],
+  '上板橋':[35.7539,139.7094],'東武練馬':[35.7596,139.6978],'下赤塚':[35.7651,139.6596],
+  '柳瀬川':[35.8197,139.5802],'みずほ台':[35.8322,139.5802],'鶴瀬':[35.8468,139.5802],
+  'ふじみ野':[35.8571,139.5227],'上福岡':[35.8669,139.5238],'新河岸':[35.8960,139.4986],
+  '北与野':[35.8835,139.6249],'与野本町':[35.8725,139.6240],'武蔵浦和':[35.8517,139.6421],
+  '中浦和':[35.8617,139.6305],'南与野':[35.8767,139.6249],'土呂':[35.9139,139.6271],
+  '東大宮':[35.9220,139.6313],'蓮田':[35.9470,139.6570],'久喜':[36.0618,139.6682],
+  '小菅':[35.7471,139.8016],'五反野':[35.7532,139.8044],'梅島':[35.7597,139.7992],
+  '西新井':[35.7682,139.7865],'竹ノ塚':[35.7790,139.7948],'谷塚':[35.8080,139.8077],
+  '新越谷':[35.8948,139.7988],'北越谷':[35.9076,139.8014],'大袋':[35.9195,139.8069],
+  'せんげん台':[35.9328,139.7879],'武里':[35.9472,139.7637],'一之江':[35.7081,139.8819],
+  '朝霞台':[35.8007,139.5994],'下総中山':[35.7211,139.9340],'幕張':[35.6572,140.0469],
+  '新検見川':[35.6629,140.0637],'西千葉':[35.6175,140.1030],'千葉みなと':[35.6063,140.1007],
+  '蘇我':[35.5776,140.1106],'稲毛海岸':[35.6380,140.0620],'南船橋':[35.6812,139.9782],
+  '辻堂':[35.3284,139.4555],'二俣新町':[35.6924,139.9735],'市川塩浜':[35.6780,139.9555],
+  '伊勢佐木長者町':[35.4406,139.6390],'京成高砂':[35.7410,139.8717],'京成船橋':[35.7003,139.9853],
+  '谷津':[35.6749,139.9999],'京成津田沼':[35.6777,140.0184],'京成幕張本郷':[35.6622,140.0383],
+  '京成稲毛':[35.6504,140.1028],'京成千葉':[35.6126,140.1195],'千葉中央':[35.6059,140.1218],
+  '辰巳':[35.6518,139.8093],'二子新地':[35.6072,139.6216],'高津':[35.5957,139.6162],
+  '宮崎台':[35.5816,139.5893],'宮前平':[35.5747,139.5774],'鷺沼':[35.5745,139.5748],
+  '江田':[35.5459,139.5252],'藤が丘':[35.5489,139.5298],'不動前':[35.6226,139.7067],
+  '武蔵小山':[35.6178,139.7078],'西小山':[35.6148,139.6936],'洗足':[35.6117,139.6914],
+  '大岡山':[35.6046,139.6934],'奥沢':[35.5997,139.6726],'梶が谷':[35.5943,139.6003],
+  '中河原':[35.6557,139.4388],'聖蹟桜ヶ丘':[35.6344,139.4305],'百合ヶ丘':[35.5988,139.4693],
+  '読売ランド前':[35.5937,139.4588],'生田':[35.5907,139.4494],'向ヶ丘遊園':[35.6015,139.5519],
+  '下地':[35.7700,139.7200]
 };
 
-// STATIONSリスト生成
-const STATIONS = Object.values(STATIONS_MAP)
-  .filter(s => COORDS[s.name])
-  .map(s => ({ ...s, lat: COORDS[s.name][0], lng: COORDS[s.name][1] }));
-
-console.log('駅数:', STATIONS.length);
+// STATIONSリスト
+const STATIONS=Object.values(STATIONS_MAP)
+  .filter(s=>COORDS[s.name])
+  .map(s=>({...s,lat:COORDS[s.name][0],lng:COORDS[s.name][1],score:null,details:{}}));
 
 // ── 地図初期化 ──────────────────────────────────────────
-const lmap = L.map('leaflet-map', { zoomControl:true }).setView([35.665, 139.720], 11);
-L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
-  attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>',
-  maxZoom:18
+const lmap=L.map('leaflet-map',{zoomControl:true}).setView([35.665,139.720],11);
+L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',{
+  attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>',maxZoom:18
 }).addTo(lmap);
 
-let stationData = [], markers = [];
+let stationData=[], markers=[], fetchCount=0, doneCount=0;
 
-// ── スコア取得 ──────────────────────────────────────────
-async function loadStation(st) {
-  const radius = document.getElementById('radiusSelect').value;
-  try {
-    const res = await fetch(`/api/score?ll=${st.lat},${st.lng}&radius=${radius}`);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    return { ...st, score: data.score || 0, details: data.details || {} };
-  } catch(e) {
-    return { ...st, score: 0, details: {} };
+// ── ローカルキャッシュ ──────────────────────────────────
+function getCacheKey(){return 'spc_v2_'+document.getElementById('radiusSelect').value;}
+
+function loadFromLocalCache(){
+  try{
+    const s=localStorage.getItem(getCacheKey());
+    return s?JSON.parse(s):null;
+  }catch(e){return null;}
+}
+
+function saveToLocalCache(data){
+  try{localStorage.setItem(getCacheKey(),JSON.stringify(data));}catch(e){}
+}
+
+// ── APIからスコア取得 ──────────────────────────────────
+async function fetchScore(st){
+  const radius=document.getElementById('radiusSelect').value;
+  try{
+    const res=await fetch('/api/score?ll='+st.lat+','+st.lng+'&radius='+radius);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    return{...st,score:data.score||0,details:data.details||{}};
+  }catch(e){
+    return{...st,score:0,details:{}};
   }
 }
 
-// ── マーカー描画 ──────────────────────────────────────────
-function drawMarker(st) {
-  const { rank, color, glow } = getRank(st.score);
-  const sz = Math.max(46, Math.round(34 + (st.score / 1000) * 52));
-  const sf = Math.round(sz * 0.28);
-  const rf = Math.round(sz * 0.19);
-  const nf = Math.max(9, Math.round(sz * 0.155));
-  const glowPx = Math.round(sz * 0.45);
+// ── 全駅ロード（即キャッシュ表示→バックグラウンド更新） ──
+async function loadAll(forceRefresh){
+  const cached=loadFromLocalCache();
 
-  const html = `<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer">
+  if(cached && !forceRefresh){
+    // キャッシュがあればすぐ表示
+    stationData=STATIONS.map(st=>{
+      const found=cached.find(c=>c.name===st.name&&c.pref===st.pref);
+      return found?{...st,...found}:{...st,score:0,details:{}};
+    });
+    document.getElementById('loading').style.display='none';
+    setStatus(stationData.filter(s=>s.score>0).length+'駅表示中（バックグラウンド更新中）',true);
+    render();
+    // バックグラウンドで最新データ取得
+    refreshBackground();
+  } else {
+    // キャッシュなし → フル取得
+    document.getElementById('loading').style.display='block';
+    setStatus('データ取得中...',true);
+    markers.forEach(m=>lmap.removeLayer(m)); markers=[];
+    fetchCount=STATIONS.length; doneCount=0;
+    stationData=await Promise.all(STATIONS.map(async st=>{
+      const result=await fetchScore(st);
+      doneCount++;
+      setStatus(doneCount+'/'+fetchCount+' 駅取得中...',true);
+      return result;
+    }));
+    document.getElementById('loading').style.display='none';
+    saveToLocalCache(stationData);
+    setStatus(stationData.filter(s=>s.score>0).length+'駅のスコアを表示',false);
+    render();
+  }
+}
+
+async function refreshBackground(){
+  const fresh=await Promise.all(STATIONS.map(fetchScore));
+  const updated=fresh.filter((f,i)=>stationData[i]&&f.score!==stationData[i].score);
+  if(updated.length>0){
+    stationData=fresh;
+    saveToLocalCache(fresh);
+    render();
+    setStatus(fresh.filter(s=>s.score>0).length+'駅表示中（更新済み）',false);
+  } else {
+    setStatus(stationData.filter(s=>s.score>0).length+'駅のスコアを表示',false);
+  }
+}
+
+function setStatus(msg,anim){
+  const el=document.getElementById('statusbar');
+  el.textContent=msg;
+  el.className=anim?'loading-anim':'';
+}
+
+// ── 重複防止：ズームに応じて表示駅を制限 ──────────────
+function getVisibleStations(data){
+  const zoom=lmap.getZoom();
+  const pref=document.getElementById('prefSelect').value;
+  const line=document.getElementById('lineSelect').value;
+
+  let filtered=data.filter(s=>{
+    if(s.score===null||s.score===0) return false;
+    if(pref&&s.pref!==pref) return false;
+    if(line&&!s.lines.includes(line)) return false;
+    return true;
+  });
+
+  // ズームが低い場合は高スコア順にグリッドで間引く
+  const thresh=zoom>=14?30:zoom>=13?55:zoom>=12?85:zoom>=11?130:200;
+
+  const sorted=[...filtered].sort((a,b)=>b.score-a.score);
+  const visible=[];
+  for(const st of sorted){
+    const p=lmap.latLngToContainerPoint([st.lat,st.lng]);
+    const tooClose=visible.some(v=>{
+      const q=lmap.latLngToContainerPoint([v.lat,v.lng]);
+      return Math.hypot(p.x-q.x,p.y-q.y)<thresh;
+    });
+    if(!tooClose) visible.push(st);
+  }
+  return visible;
+}
+
+// ── マーカー描画 ──────────────────────────────────────
+function drawMarker(st){
+  const{rank,color,glow}=getRank(st.score);
+  const sz=Math.max(44,Math.round(32+(st.score/1000)*54));
+  const glowPx=Math.round(sz*0.5);
+  const nf=Math.max(9,Math.round(sz*0.155));
+
+  const html=`<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer">
     <div style="width:${sz}px;height:${sz}px;border-radius:50%;
-      background:${color}1a;border:2.5px solid ${color};
+      background:${color}18;border:2px solid ${color};
       box-shadow:0 0 ${glowPx}px ${glow};
       display:flex;flex-direction:column;align-items:center;justify-content:center">
-      <span style="font-weight:900;font-size:${sf}px;color:#fff;line-height:1.1">${st.score}</span>
-      <span style="font-weight:700;font-size:${rf}px;color:${color};line-height:1">${rank}</span>
+      <span style="font-weight:900;font-size:${Math.round(sz*0.27)}px;color:#fff;line-height:1.1">${st.score}</span>
+      <span style="font-weight:700;font-size:${Math.round(sz*0.19)}px;color:${color};line-height:1">${rank}</span>
     </div>
-    <span style="font-size:${nf}px;color:rgba(255,255,255,0.85);white-space:nowrap;margin-top:2px;text-shadow:0 1px 4px #000">${st.name}</span>
+    <span style="font-size:${nf}px;color:rgba(255,255,255,0.82);white-space:nowrap;
+      margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.9)">${st.name}</span>
   </div>`;
 
-  const icon = L.divIcon({ className:'', html, iconSize:[sz+60, sz+20], iconAnchor:[(sz+60)/2, sz/2] });
-  const m = L.marker([st.lat, st.lng], { icon }).addTo(lmap);
-  m.on('click', () => showInfo(st));
+  const icon=L.divIcon({className:'',html,iconSize:[sz+60,sz+20],iconAnchor:[(sz+60)/2,sz/2]});
+  const m=L.marker([st.lat,st.lng],{icon}).addTo(lmap);
+  m.on('click',()=>showInfo(st));
   markers.push(m);
 }
 
-// ── 詳細パネル ──────────────────────────────────────────
-function showInfo(st) {
-  const { rank, color } = getRank(st.score);
-  document.getElementById('ip-name').textContent = st.name + '駅';
-  document.getElementById('ip-line').textContent = st.lines.join(' / ');
-  const sc = document.getElementById('ip-score');
-  sc.textContent = st.score + '点';
-  sc.style.color = color;
-  document.getElementById('ip-rank').textContent = rank + 'ランク';
-  document.getElementById('ip-rank').style.color = color;
+// ── 詳細パネル ────────────────────────────────────────
+function showInfo(st){
+  const{rank,color}=getRank(st.score);
+  document.getElementById('ip-name').textContent=st.name+'駅';
+  document.getElementById('ip-line').textContent=st.lines.join(' / ');
+  const scoreEl=document.getElementById('ip-score');
+  scoreEl.textContent=st.score;
+  scoreEl.style.color=color;
+  document.getElementById('ip-rank').textContent=rank+'ランク';
+  document.getElementById('ip-rank').style.color=color;
 
-  const AXIS_COLORS = {
-    '飲食充実':'#ff4060','生活利便':'#4a9fd4','ビジネス':'#9b7fe8',
-    '商業多様性':'#2e9e60','医療・福祉':'#f09000','総合ボーナス':'#556677'
-  };
-  const details = st.details || {};
-  document.getElementById('ip-details').innerHTML = Object.entries(details).map(([k, v]) => {
-    const pts = v.pts || 0, max = v.max || 100, cnt = v.count || 0;
-    const pct = Math.round((pts / max) * 100);
-    const ac = AXIS_COLORS[k] || '#aaa';
-    return `<div class="ip-row">
-      <span class="ip-row-label">${k}</span>
-      <div class="ip-bar-wrap"><div class="ip-bar" style="width:${pct}%;background:${ac}"></div></div>
-      <span class="ip-pts">${pts}<span style="font-size:9px;color:#555;font-weight:400">/${max}</span></span>
+  const axes=['飲食充実','生活利便','商業・小売','医療・福祉'];
+  const axisColors={'飲食充実':'#ff4060','生活利便':'#4a9fd4','商業・小売':'#9b7fe8','医療・福祉':'#f09000'};
+  const details=st.details||{};
+
+  document.getElementById('ip-axes').innerHTML=axes.map(name=>{
+    const d=details[name]||{pts:0,max:100,color:'#666'};
+    const pct=Math.round((d.pts/d.max)*100);
+    const ac=axisColors[name]||d.color||'#666';
+    const shortName=name.replace('充実','').replace('生活','生活').replace('商業・小売','商業');
+    return`<div class="ip-axis">
+      <span class="ip-axis-label">${shortName}</span>
+      <div class="ip-bar-track"><div class="ip-bar-fill" style="width:${pct}%;background:${ac}"></div></div>
+      <span class="ip-pts" style="color:${ac}">${d.pts}<span style="font-size:8px;color:#3a4060;font-weight:400">/${d.max}</span></span>
     </div>`;
   }).join('');
-  document.getElementById('info-panel').style.display = 'block';
+
+  document.getElementById('info-panel').style.display='block';
 }
 
-// ── フィルター ──────────────────────────────────────────
-function onPrefChange() {
-  const pref = document.getElementById('prefSelect').value;
-  const lineSelect = document.getElementById('lineSelect');
-  lineSelect.innerHTML = '<option value="">全路線</option>';
-  if (pref && LINE_DATA[pref]) {
-    Object.keys(LINE_DATA[pref]).forEach(line => {
-      const opt = document.createElement('option');
-      opt.value = line; opt.textContent = line;
-      lineSelect.appendChild(opt);
-    });
-  }
-  render();
-}
+// ── ランキング更新 ────────────────────────────────────
+function updateTable(filtered){
+  const sorted=[...filtered].sort((a,b)=>b.score-a.score);
+  const axisColors={'飲食充実':'#ff4060','生活利便':'#4a9fd4','商業・小売':'#9b7fe8','医療・福祉':'#f09000'};
 
-function getFilteredStations() {
-  const pref = document.getElementById('prefSelect').value;
-  const line = document.getElementById('lineSelect').value;
-  return stationData.filter(s => {
-    if (pref && s.pref !== pref) return false;
-    if (line && !s.lines.includes(line)) return false;
-    return s.score !== null;
-  });
-}
+  document.getElementById('table-area').innerHTML=sorted.map((st,i)=>{
+    const{rank,color}=getRank(st.score);
+    const details=st.details||{};
+    const catBars=Object.entries(details).map(([name,d])=>{
+      const pct=Math.round((d.pts/d.max)*100);
+      const ac=axisColors[name]||d.color||'#666';
+      const shortName=name.replace('充実','').replace('商業・小売','商業').replace('生活利便','生活').replace('医療・福祉','医療');
+      return`<span class="rcat" style="background:${ac}22;color:${ac};border:1px solid ${ac}44">${shortName} ${d.pts}</span>`;
+    }).join('');
 
-// ── 描画 ──────────────────────────────────────────
-function render() {
-  markers.forEach(m => lmap.removeLayer(m)); markers = [];
-  document.getElementById('info-panel').style.display = 'none';
-  const filtered = getFilteredStations();
-  filtered.forEach(drawMarker);
-  updateTable(filtered);
-}
-
-function updateTable(filtered) {
-  const sorted = [...filtered].sort((a, b) => b.score - a.score);
-  document.getElementById('table-area').innerHTML = sorted.map((st, i) => {
-    const { rank, color } = getRank(st.score);
-    return `<div class="rank-row" onclick="onTableClick('${st.name}','${st.pref}')">
-      <span class="rn">${i + 1}</span>
-      <div class="rbadge" style="background:${color}22;border:2px solid ${color};color:${color}">${rank}</div>
+    return`<div class="rank-row" onclick="onTableClick('${st.name}','${st.pref}')">
+      <span class="rn">${i+1}</span>
+      <div class="rbadge" style="background:${color}22;border:1.5px solid ${color};color:${color}">${rank}</div>
       <div class="rinfo">
         <div class="rname">${st.name}駅</div>
-        <div class="rline">${st.lines[0]}${st.lines.length > 1 ? ' ほか' : ''}</div>
+        <div class="rline">${st.lines[0]}${st.lines.length>1?' ほか':''} · ${st.pref}</div>
+        <div class="rcats">${catBars}</div>
       </div>
       <span class="rscore" style="color:${color}">${st.score}</span>
     </div>`;
   }).join('');
 }
 
-function onTableClick(name, pref) {
-  const st = stationData.find(s => s.name === name && s.pref === pref);
-  if (!st) return;
+function onTableClick(name,pref){
+  const st=stationData.find(s=>s.name===name&&s.pref===pref);
+  if(!st) return;
   setView('map');
-  lmap.setView([st.lat, st.lng], 14);
+  lmap.setView([st.lat,st.lng],14);
   showInfo(st);
 }
 
-// ── ビュー切替 ──────────────────────────────────────────
-function setView(v) {
-  document.getElementById('btnMap').classList.toggle('active', v === 'map');
-  document.getElementById('btnTable').classList.toggle('active', v === 'table');
-  document.getElementById('map-area').style.visibility = v === 'map' ? 'visible' : 'hidden';
-  document.getElementById('table-area').style.display = v === 'table' ? 'block' : 'none';
-  if (v === 'map') setTimeout(() => lmap.invalidateSize(), 100);
-}
-
-// ── モーダル ──────────────────────────────────────────
-function openModal() { document.getElementById('modal-bg').classList.add('open'); }
-function closeModal() { document.getElementById('modal-bg').classList.remove('open'); }
-
-// ── 全駅ロード ──────────────────────────────────────────
-async function loadAll() {
-  markers.forEach(m => lmap.removeLayer(m)); markers = [];
-  document.getElementById('info-panel').style.display = 'none';
-  document.getElementById('loading').style.display = 'block';
-  stationData = await Promise.all(STATIONS.map(loadStation));
-  document.getElementById('loading').style.display = 'none';
+// ── フィルター ──────────────────────────────────────────
+function onPrefChange(){
+  const pref=document.getElementById('prefSelect').value;
+  const lineSelect=document.getElementById('lineSelect');
+  lineSelect.innerHTML='<option value="">全路線</option>';
+  if(pref&&LINE_DATA[pref]){
+    Object.keys(LINE_DATA[pref]).forEach(line=>{
+      const opt=document.createElement('option');
+      opt.value=line; opt.textContent=line;
+      lineSelect.appendChild(opt);
+    });
+  }
   render();
 }
 
-lmap.on('click', () => { document.getElementById('info-panel').style.display = 'none'; });
-document.getElementById('radiusSelect').addEventListener('change', loadAll);
-loadAll();
+// ── 描画 ──────────────────────────────────────────────
+function render(){
+  markers.forEach(m=>lmap.removeLayer(m)); markers=[];
+  document.getElementById('info-panel').style.display='none';
+
+  const visible=getVisibleStations(stationData);
+  visible.forEach(drawMarker);
+
+  const pref=document.getElementById('prefSelect').value;
+  const line=document.getElementById('lineSelect').value;
+  const tableData=stationData.filter(s=>{
+    if(!s.score) return false;
+    if(pref&&s.pref!==pref) return false;
+    if(line&&!s.lines.includes(line)) return false;
+    return true;
+  });
+  updateTable(tableData);
+}
+
+// ── ビュー切替 ──────────────────────────────────────────
+function setView(v){
+  document.getElementById('btnMap').classList.toggle('active',v==='map');
+  document.getElementById('btnTable').classList.toggle('active',v==='table');
+  document.getElementById('map-area').style.visibility=v==='map'?'visible':'hidden';
+  document.getElementById('table-area').style.display=v==='table'?'block':'none';
+  if(v==='map') setTimeout(()=>lmap.invalidateSize(),100);
+}
+
+// ── モーダル ──────────────────────────────────────────
+function openModal(){document.getElementById('modal-bg').classList.add('open');}
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
+
+// ── イベント ──────────────────────────────────────────
+lmap.on('click',()=>{document.getElementById('info-panel').style.display='none';});
+lmap.on('zoomend moveend',()=>{if(stationData.length>0) render();});
+document.getElementById('radiusSelect').addEventListener('change',()=>{
+  localStorage.removeItem(getCacheKey());
+  loadAll(true);
+});
+
+// 起動
+loadAll(false);
 </script>
 </body>
 </html>
