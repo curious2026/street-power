@@ -49,8 +49,7 @@ const AXIS_MAP = {
 const AXES = ['飲食','商業','生活','医療'];
 const MAX_PTS = {'飲食':350,'商業':350,'生活':200,'医療':100};
 
-// 全体の最大値（相対評価用）
-// 初期値は新宿レベルの実測値を仮設定、全駅取得後に更新
+// 全体の最大値（起動時にキャッシュから復元、取得ごとに更新）
 let globalMax = {'飲食':2459,'商業':500,'生活':600,'医療':200};
 
 async function getRawCounts(lat, lng, radius) {
@@ -78,105 +77,98 @@ async function getRawCounts(lat, lng, radius) {
   });
 }
 
-function calcScore(counts) {
-  const details={};
-  let total=0;
-  AXES.forEach(axis=>{
-    const pts=Math.round((counts[axis]/globalMax[axis])*MAX_PTS[axis]);
-    const capped=Math.min(MAX_PTS[axis],pts);
-    details[axis]={count:counts[axis],pts:capped,max:MAX_PTS[axis]};
-    total+=capped;
-  });
-  return {score:Math.min(1000,total),details};
+// 対数スケールでスコア計算
+function logScore(count, maxCount, maxPts) {
+  if(count <= 0) return 0;
+  const ratio = Math.log(1 + count) / Math.log(1 + maxCount);
+  return Math.min(maxPts, Math.round(ratio * maxPts));
 }
 
-// 最大値を更新して全キャッシュのスコアを再計算
-function rebuildScores() {
-  const raw_prefix='raw_';
-  Object.keys(cache).forEach(k=>{
-    if(k.startsWith(raw_prefix)){
-      const scoreKey=k.replace(raw_prefix,'score_');
-      const result=calcScore(cache[k]);
-      cache[scoreKey]=result;
+function calcScore(counts) {
+  const details = {};
+  let total = 0;
+  AXES.forEach(axis => {
+    const pts = logScore(counts[axis], globalMax[axis], MAX_PTS[axis]);
+    details[axis] = { count: counts[axis], pts, max: MAX_PTS[axis] };
+    total += pts;
+  });
+  return { score: Math.min(1000, total), details };
+}
+
+// 全rawキャッシュからglobalMaxを再計算してスコアを再構築
+function rebuildAllScores() {
+  Object.keys(cache).forEach(k => {
+    if(k.startsWith('raw_')) {
+      const scoreKey = k.replace('raw_','score_');
+      cache[scoreKey] = calcScore(cache[k]);
     }
   });
   saveCache(cache);
 }
 
-// 個別スコア取得API
-app.get('/api/score', async(req,res)=>{
-  const {ll,radius}=req.query;
-  const r=parseInt(radius)||800;
-  const rawKey='raw_'+ll+'_'+r;
-  const scoreKey='score_'+ll+'_'+r;
+app.get('/api/score', async(req,res) => {
+  const {ll, radius} = req.query;
+  const r = parseInt(radius)||800;
+  const rawKey = 'raw_'+ll+'_'+r;
+  const scoreKey = 'score_'+ll+'_'+r;
 
-  // キャッシュヒット
-  if(cache[scoreKey]){
-    return res.json({...cache[scoreKey],cached:true});
+  if(cache[scoreKey]) {
+    return res.json({...cache[scoreKey], cached:true});
   }
 
-  try{
-    const [lat,lng]=ll.split(',').map(Number);
-    console.log('取得中:',ll);
-    const counts=await getRawCounts(lat,lng,r);
+  try {
+    const [lat,lng] = ll.split(',').map(Number);
+    const counts = await getRawCounts(lat, lng, r);
 
-    // globalMaxを更新
-    let maxUpdated=false;
-    AXES.forEach(axis=>{
-      if(counts[axis]>globalMax[axis]){
-        globalMax[axis]=counts[axis];
-        maxUpdated=true;
+    let maxUpdated = false;
+    AXES.forEach(axis => {
+      if(counts[axis] > globalMax[axis]) {
+        globalMax[axis] = counts[axis];
+        maxUpdated = true;
       }
     });
 
-    // 最大値が更新されたら全スコア再計算
-    if(maxUpdated){
+    cache[rawKey] = counts;
+
+    if(maxUpdated) {
       console.log('globalMax更新:', globalMax);
-      cache[rawKey]=counts;
-      rebuildScores();
+      rebuildAllScores();
     } else {
-      cache[rawKey]=counts;
-      const result=calcScore(counts);
-      cache[scoreKey]=result;
+      cache[scoreKey] = calcScore(counts);
       saveCache(cache);
     }
 
-    res.json({...cache[scoreKey],cached:false});
-  }catch(e){
+    res.json({...cache[scoreKey], cached:false});
+  } catch(e) {
     console.error(e.message);
-    res.status(500).json({error:e.message,score:0,details:{}});
+    res.status(500).json({error:e.message, score:0, details:{}});
   }
 });
 
-// globalMax取得API（フロントの相対表示用）
-app.get('/api/maxvals',(req,res)=>{
-  res.json(globalMax);
+app.get('/api/test', async(req,res) => {
+  try {
+    const counts = await getRawCounts(35.6896, 139.7006, 800);
+    res.json({ok:true, counts, globalMax, score:calcScore(counts)});
+  } catch(e) { res.json({ok:false, error:e.message}); }
 });
 
-app.get('/api/test',async(req,res)=>{
-  try{
-    const counts=await getRawCounts(35.6896,139.7006,800);
-    res.json({ok:true,counts,globalMax});
-  }catch(e){res.json({ok:false,error:e.message});}
+app.get('/api/cache', (req,res) => {
+  const scores = Object.keys(cache).filter(k=>k.startsWith('score_'));
+  res.json({total:Object.keys(cache).length, scores:scores.length, globalMax});
 });
 
-app.get('/api/cache',(req,res)=>{
-  const scoreKeys=Object.keys(cache).filter(k=>k.startsWith('score_'));
-  res.json({total:Object.keys(cache).length,scores:scoreKeys.length,globalMax});
-});
-
-initDB().then(()=>{
+initDB().then(() => {
   console.log('DuckDB初期化完了');
-
-  // 起動時にキャッシュからglobalMaxを復元
-  const rawKeys=Object.keys(cache).filter(k=>k.startsWith('raw_'));
-  rawKeys.forEach(k=>{
-    AXES.forEach(axis=>{
-      if(cache[k][axis]>globalMax[axis]) globalMax[axis]=cache[k][axis];
+  // キャッシュからglobalMaxを復元
+  Object.keys(cache).filter(k=>k.startsWith('raw_')).forEach(k => {
+    AXES.forEach(axis => {
+      if(cache[k][axis] > globalMax[axis]) globalMax[axis] = cache[k][axis];
     });
   });
   console.log('globalMax復元:', globalMax);
+  // スコアを対数スケールで再計算
+  rebuildAllScores();
 
-  const PORT=process.env.PORT||3000;
-  app.listen(PORT,()=>console.log('Server running on port '+PORT));
-}).catch(e=>{console.error(e);process.exit(1);});
+  const PORT = process.env.PORT||3000;
+  app.listen(PORT, ()=>console.log('Server running on port '+PORT));
+}).catch(e => { console.error(e); process.exit(1); });
