@@ -13,51 +13,68 @@
 html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto Sans JP',sans-serif}
 #app{display:flex;flex-direction:column;height:100vh}
 
+/* ── ヘッダー ── */
 #header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;height:52px;flex-shrink:0;
-  background:linear-gradient(135deg,#0b0f1e,#0f1428);
-  border-bottom:1px solid rgba(255,255,255,0.06);
-  z-index:2000;gap:10px;box-shadow:0 2px 16px rgba(0,0,0,0.4)
+  padding:0 16px;height:54px;flex-shrink:0;
+  background:linear-gradient(135deg,#090d1e 0%,#0d1228 50%,#111830 100%);
+  border-bottom:1px solid rgba(120,140,255,0.12);
+  z-index:2000;gap:10px;
+  box-shadow:0 2px 20px rgba(0,0,0,0.5)
 }
-.logo{display:flex;align-items:center;gap:10px;cursor:pointer;flex-shrink:0}
-.logo-main{font-size:20px;font-weight:900;letter-spacing:2.5px;white-space:nowrap;
-  background:linear-gradient(110deg,#fff 0%,#c8d4f0 60%,#8a9fd0 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.info-btn{font-size:10px;color:#6070a0;border:1px solid rgba(100,120,180,0.25);
-  padding:3px 9px;border-radius:20px;cursor:pointer;white-space:nowrap;
-  background:rgba(100,120,180,0.06);transition:all 0.2s;font-family:inherit}
-.info-btn:hover{border-color:rgba(130,160,255,0.5);color:#a0b8ff}
+.logo{display:flex;align-items:center;gap:12px;cursor:pointer;flex-shrink:0}
+.logo-main{
+  font-size:22px;font-weight:900;letter-spacing:3px;white-space:nowrap;
+  background:linear-gradient(110deg,#ffffff 0%,#e0e8ff 40%,#a0b8ff 80%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:none;
+  filter:drop-shadow(0 0 12px rgba(120,160,255,0.3))
+}
+.info-btn{
+  font-size:11px;color:#c0d0ff;border:1px solid rgba(140,170,255,0.4);
+  padding:4px 11px;border-radius:20px;cursor:pointer;white-space:nowrap;
+  background:rgba(100,130,255,0.1);transition:all 0.2s;font-family:inherit;font-weight:600
+}
+.info-btn:hover{border-color:rgba(160,190,255,0.7);color:#e0eaff;background:rgba(100,130,255,0.2)}
 .hcontrols{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.hsel{background:rgba(255,255,255,0.04);color:#c0cce0;
-  border:1px solid rgba(255,255,255,0.08);padding:5px 8px;border-radius:8px;
-  font-size:11px;cursor:pointer;outline:none;font-family:inherit}
-.view-tabs{display:flex;border:1px solid rgba(255,255,255,0.08);border-radius:9px;overflow:hidden}
-.vtab{background:transparent;color:#5a6888;border:none;padding:6px 13px;
-  font-size:11px;cursor:pointer;transition:all 0.15s;white-space:nowrap;font-family:inherit;font-weight:600}
-.vtab.active{background:rgba(100,130,220,0.2);color:#e2e6f0}
-.vtab:hover:not(.active){background:rgba(255,255,255,0.04);color:#a0b0d0}
+.hsel{
+  background:rgba(255,255,255,0.05);color:#d0d8f0;
+  border:1px solid rgba(255,255,255,0.1);
+  padding:5px 8px;border-radius:8px;font-size:11px;cursor:pointer;outline:none;font-family:inherit
+}
+.view-tabs{display:flex;border:1px solid rgba(255,255,255,0.1);border-radius:9px;overflow:hidden}
+.vtab{
+  background:transparent;color:#7888a8;border:none;
+  padding:6px 13px;font-size:11px;cursor:pointer;
+  transition:all 0.15s;white-space:nowrap;font-family:inherit;font-weight:600
+}
+.vtab.active{background:rgba(100,130,220,0.25);color:#e8eeff}
+.vtab:hover:not(.active){background:rgba(255,255,255,0.05);color:#b0c0e0}
 
-#filters{display:flex;align-items:center;gap:8px;padding:5px 16px;
-  background:#080b16;border-bottom:1px solid rgba(255,255,255,0.04);flex-shrink:0}
-.flabel{font-size:10px;color:#304060;white-space:nowrap;letter-spacing:1.5px;text-transform:uppercase;font-weight:600}
-#statusbar{margin-left:auto;font-size:10px;color:#4a6090;white-space:nowrap;flex-shrink:0;font-weight:600}
-#statusbar.anim{color:#5a80ff;animation:pulse 1.5s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:0.35}50%{opacity:1}}
+/* ── フィルターバー ── */
+#filters{
+  display:flex;align-items:center;gap:8px;padding:5px 16px;
+  background:#080b16;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0
+}
+.flabel{font-size:10px;color:#6878a0;white-space:nowrap;letter-spacing:1.5px;text-transform:uppercase;font-weight:600}
+#statusbar{margin-left:auto;font-size:10px;color:#6878a0;white-space:nowrap;flex-shrink:0;font-weight:600}
+#statusbar.anim{color:#6090ff;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
 
+/* ── コンテンツ ── */
 #content{flex:1;position:relative;overflow:hidden;display:flex}
 #map-area{position:relative;flex:1;min-width:0;overflow:hidden}
 #leaflet-map{width:100%;height:100%}
 .leaflet-container{background:#080c18!important}
 .leaflet-tile-pane{filter:brightness(0.68) saturate(0.28) hue-rotate(215deg)}
 .leaflet-control-zoom{margin:14px!important}
-.leaflet-control-zoom a{background:#0b0f1e!important;color:#6070a0!important;
-  border-color:rgba(255,255,255,0.08)!important;width:28px!important;height:28px!important;
+.leaflet-control-zoom a{background:#0b0f1e!important;color:#7080b0!important;
+  border-color:rgba(255,255,255,0.1)!important;width:28px!important;height:28px!important;
   line-height:28px!important;font-size:14px!important}
-.leaflet-control-zoom a:hover{background:#141828!important;color:#c0d0ff!important}
+.leaflet-control-zoom a:hover{background:#141828!important;color:#d0e0ff!important}
 
 #table-area{width:380px;flex-shrink:0;overflow-y:auto;background:#080b16;
-  border-left:1px solid rgba(255,255,255,0.05);display:none}
+  border-left:1px solid rgba(255,255,255,0.06);display:none}
 #map-area.hidden-mobile{display:none}
 #table-area.visible-mobile{display:block!important;position:absolute;inset:0;width:100%;border:none;z-index:10}
 
@@ -70,94 +87,105 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
   .leaflet-control-zoom{display:none!important}
 }
 
-/* 凡例 - スマホは極限左下 */
-#legend{position:absolute;bottom:8px;left:8px;z-index:1000;
-  background:rgba(6,9,16,0.92);border:1px solid rgba(255,255,255,0.07);
-  border-radius:9px;padding:9px 12px;backdrop-filter:blur(10px)}
-.leg-title{font-size:8px;color:#304060;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;font-weight:600}
-.leg-item{display:flex;align-items:center;gap:7px;margin-bottom:3px;font-size:9px;color:#6878a0}
-.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+/* ── 凡例 ── */
+#legend{
+  position:absolute;bottom:8px;left:8px;z-index:1000;
+  background:rgba(6,9,16,0.93);border:1px solid rgba(255,255,255,0.09);
+  border-radius:9px;padding:9px 12px;backdrop-filter:blur(10px)
+}
+.leg-title{font-size:9px;color:#6878a0;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;font-weight:700}
+.leg-item{display:flex;align-items:center;gap:7px;margin-bottom:3px;font-size:10px;color:#9098b8}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 @media(min-width:768px){
   #legend{bottom:20px;left:14px;padding:11px 14px}
-  .leg-title{font-size:9px}
+  .leg-title{font-size:9px;margin-bottom:8px}
   .leg-item{font-size:10px;margin-bottom:4px}
-  .leg-dot{width:10px;height:10px}
 }
 
-/* 詳細パネル - スマホは極限右下 */
-#info-panel{position:absolute;bottom:8px;right:8px;z-index:1000;
-  background:rgba(6,9,16,0.97);border:1px solid rgba(255,255,255,0.08);
-  border-radius:12px;padding:14px;min-width:200px;max-width:240px;
-  display:none;backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,0.6)}
+/* ── 詳細パネル（右下） ── */
+#info-panel{
+  position:absolute;bottom:8px;right:8px;z-index:1000;
+  background:rgba(6,9,16,0.97);border:1px solid rgba(255,255,255,0.1);
+  border-radius:13px;padding:15px;min-width:205px;max-width:245px;
+  display:none;backdrop-filter:blur(16px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.7)
+}
 @media(min-width:768px){
-  #info-panel{bottom:20px;right:400px;padding:18px;min-width:218px;max-width:258px;border-radius:14px}
+  #info-panel{bottom:20px;right:400px;padding:18px;min-width:220px;max-width:260px}
 }
-.ip-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.ip-name{font-size:16px;font-weight:900;color:#fff;letter-spacing:0.5px}
-.ip-line{font-size:9px;color:#405070;margin-top:3px;line-height:1.5}
-.ip-close{background:none;border:none;color:#304060;font-size:16px;cursor:pointer;padding:0}
+.ip-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px}
+.ip-name{font-size:17px;font-weight:900;color:#fff;letter-spacing:0.5px}
+.ip-line{font-size:9px;color:#6878a0;margin-top:3px;line-height:1.5}
+.ip-close{background:none;border:none;color:#6878a0;font-size:16px;cursor:pointer;padding:0}
 .ip-close:hover{color:#fff}
-.ip-score{font-size:46px;font-weight:900;line-height:1;letter-spacing:-2px}
-.ip-rank-lbl{font-size:10px;font-weight:700;margin-top:2px;margin-bottom:12px;letter-spacing:1.5px;text-transform:uppercase}
-/* 4軸を2x2グリッドで表示 */
-.ip-axes-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ip-score{font-size:48px;font-weight:900;line-height:1;letter-spacing:-2px}
+.ip-rank-lbl{font-size:10px;font-weight:700;margin-top:2px;margin-bottom:13px;letter-spacing:1.5px;text-transform:uppercase}
+.ip-axes-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .ip-axis{display:flex;flex-direction:column;gap:3px}
-.ip-axis-lbl{font-size:9px;color:#4a5878;font-weight:600}
+.ip-axis-lbl{font-size:9px;color:#7888a8;font-weight:600}
 .ip-axis-row{display:flex;align-items:center;gap:5px}
-.ip-track{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.ip-track{flex:1;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden}
 .ip-fill{height:3px;border-radius:2px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1)}
-.ip-pts{font-size:10px;font-weight:700;min-width:32px;text-align:right}
+.ip-pts{font-size:10px;font-weight:700;min-width:30px;text-align:right}
 
+/* ── ローディング ── */
 #loading{position:absolute;inset:0;display:none;
   align-items:center;justify-content:center;
-  background:rgba(6,9,16,0.7);z-index:3000;backdrop-filter:blur(4px)}
+  background:rgba(6,9,16,0.75);z-index:3000;backdrop-filter:blur(4px)}
 #loading.show{display:flex}
-.ld-ring{width:36px;height:36px;border:2px solid rgba(255,255,255,0.06);
-  border-top-color:#5a80ff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}
-.ld-txt{font-size:11px;color:#4a5878;font-weight:600;text-align:center}
+.ld-ring{width:36px;height:36px;border:2px solid rgba(255,255,255,0.07);
+  border-top-color:#6090ff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}
+.ld-txt{font-size:11px;color:#7888a8;font-weight:600;text-align:center}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ランキング */
-.rank-header{padding:12px 16px 8px;border-bottom:1px solid rgba(255,255,255,0.05);
-  font-size:10px;color:#304060;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;
-  display:flex;justify-content:space-between;align-items:center}
-.rank-row{display:flex;align-items:center;gap:10px;padding:10px 16px;
-  border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer;transition:background 0.12s}
+/* ── ランキング ── */
+.rank-header{
+  padding:12px 16px 8px;border-bottom:1px solid rgba(255,255,255,0.06);
+  font-size:10px;color:#8898b8;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;
+  display:flex;justify-content:space-between;align-items:center
+}
+.rank-row{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 14px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  cursor:pointer;transition:background 0.12s
+}
 .rank-row:hover{background:rgba(255,255,255,0.03)}
-.rn{font-size:15px;font-weight:900;width:28px;text-align:right;flex-shrink:0;
-  font-variant-numeric:tabular-nums;color:#2a3558}
-.rn.top3{color:#4a6090;font-size:17px}
+.rn{font-size:14px;font-weight:900;width:26px;text-align:right;flex-shrink:0;
+  font-variant-numeric:tabular-nums;color:#4a5878}
+.rn.top3{color:#6080a8;font-size:16px}
 .rbadge{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;
   justify-content:center;font-weight:900;font-size:11px;flex-shrink:0}
 .rinfo{flex:1;min-width:0}
-.rname{font-size:14px;font-weight:700;color:#e2e6f0;letter-spacing:0.3px}
-.rline{font-size:9px;color:#404870;margin-top:2px}
-.rcats{display:flex;gap:3px;margin-top:5px;flex-wrap:wrap}
-.rcat{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;white-space:nowrap}
+.rname{font-size:14px;font-weight:700;color:#e8eeff;letter-spacing:0.3px}
+.rline{font-size:9px;color:#6878a0;margin-top:2px}
+/* カテゴリを1行に */
+.rcats{display:flex;gap:3px;margin-top:5px;flex-wrap:nowrap;overflow:hidden}
+.rcat{font-size:8px;padding:2px 5px;border-radius:3px;font-weight:700;white-space:nowrap;flex-shrink:0}
 .rscore{font-size:22px;font-weight:900;flex-shrink:0;letter-spacing:-0.5px;
-  font-variant-numeric:tabular-nums;min-width:48px;text-align:right}
+  font-variant-numeric:tabular-nums;min-width:46px;text-align:right}
 
-/* モーダル */
-#modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:5000;
+/* ── モーダル ── */
+#modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:5000;
   display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
 #modal-bg.open{display:flex}
-#modal{background:#0b0f1e;border:1px solid rgba(255,255,255,0.08);border-radius:18px;
+#modal{background:#0b0f1e;border:1px solid rgba(255,255,255,0.1);border-radius:18px;
   padding:24px;width:340px;max-height:88vh;overflow-y:auto;
   box-shadow:0 24px 80px rgba(0,0,0,0.8)}
 .modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .modal-title{font-size:17px;font-weight:900;color:#fff}
-.modal-x{background:none;border:none;color:#4a6080;font-size:22px;cursor:pointer;font-family:inherit}
+.modal-x{background:none;border:none;color:#8898b8;font-size:22px;cursor:pointer;font-family:inherit}
 .modal-x:hover{color:#fff}
-.modal-desc{font-size:11px;color:#4a6080;margin-bottom:20px;line-height:1.85}
+.modal-desc{font-size:11px;color:#8898b8;margin-bottom:20px;line-height:1.85}
 .modal-ax{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;
-  padding:12px 13px;background:rgba(255,255,255,0.02);
-  border-radius:10px;border:1px solid rgba(255,255,255,0.05)}
+  padding:12px 13px;background:rgba(255,255,255,0.03);
+  border-radius:10px;border:1px solid rgba(255,255,255,0.07)}
 .modal-pt{width:44px;height:44px;border-radius:9px;display:flex;align-items:center;
   justify-content:center;font-weight:900;font-size:16px;color:#fff;flex-shrink:0}
-.modal-ax-name{font-weight:700;font-size:13px;color:#e2e6f0;margin-bottom:3px}
-.modal-ax-desc{font-size:10px;color:#4a6080;line-height:1.6}
-.modal-note{font-size:10px;color:#253050;margin-top:16px;line-height:1.9;
-  border-top:1px solid rgba(255,255,255,0.05);padding-top:14px}
+.modal-ax-name{font-weight:700;font-size:13px;color:#e8eeff;margin-bottom:3px}
+.modal-ax-desc{font-size:10px;color:#8898b8;line-height:1.6}
+.modal-note{font-size:10px;color:#6070a0;margin-top:16px;line-height:1.9;
+  border-top:1px solid rgba(255,255,255,0.07);padding-top:14px}
 </style>
 </head>
 <body>
@@ -199,12 +227,11 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
       <div id="leaflet-map"></div>
       <div id="legend">
         <div class="leg-title">戦闘力ランク</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#ff2244;box-shadow:0 0 6px #ff224466"></div>S　800〜1000</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#ff2244;box-shadow:0 0 7px #ff224466"></div>S　800〜1000</div>
         <div class="leg-item"><div class="leg-dot" style="background:#ff8800"></div>A　600〜799</div>
         <div class="leg-item"><div class="leg-dot" style="background:#ffd700"></div>B　400〜599</div>
         <div class="leg-item"><div class="leg-dot" style="background:#44cc88"></div>C　200〜399</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#44aaff"></div>D　100〜199</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#556677"></div>E　0〜99</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#44aaff"></div>D　0〜199</div>
       </div>
       <div id="info-panel">
         <div class="ip-head">
@@ -236,9 +263,9 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
       <button class="modal-x" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-desc">
-      各駅から指定半径（デフォルト800m）圏内の商業施設数をもとに<strong style="color:#e2e6f0">1000点満点</strong>で数値化。<br>
-      <strong style="color:#9ab8ff">対数スケール</strong>採用により、施設数トップ駅が突出しすぎない自然なランク分布になります。<br><br>
-      データ：<strong style="color:#9ab8ff">Overture Maps</strong>（Meta・Microsoft・Amazon等提供）
+      各駅から指定半径（デフォルト800m）圏内の商業施設数をもとに<strong style="color:#e8eeff">1000点満点</strong>で数値化。<br>
+      <strong style="color:#a0b8ff">対数スケール</strong>採用により、施設数トップ駅が突出しすぎない自然なランク分布になります。<br><br>
+      データ：<strong style="color:#a0b8ff">Overture Maps</strong>（Meta・Microsoft・Amazon等提供）
     </div>
     <div class="modal-ax">
       <div class="modal-pt" style="background:linear-gradient(135deg,#ff3355,#ff6080)">350</div>
@@ -270,21 +297,19 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// ── ランク定義（S=赤→A=橙→B=黄→C=緑→D=水色） ──
+// Eランク廃止・D=0〜199
 const RANKS=[
   {rank:'S',color:'#ff2244',glow:'#ff224455',min:800},
   {rank:'A',color:'#ff8800',glow:'#ff880050',min:600},
   {rank:'B',color:'#ffd700',glow:'#ffd70050',min:400},
   {rank:'C',color:'#44cc88',glow:'#44cc8850',min:200},
-  {rank:'D',color:'#44aaff',glow:'#44aaff50',min:100},
-  {rank:'E',color:'#556677',glow:'#55667740',min:0}
+  {rank:'D',color:'#44aaff',glow:'#44aaff50',min:0}
 ];
-function getRank(s){return RANKS.find(r=>s>=r.min)||RANKS[5];}
+function getRank(s){return RANKS.find(r=>s>=r.min)||RANKS[4];}
 const AC={'飲食':'#ff4466','商業':'#9070ff','生活':'#3aa0ff','医療':'#f09030'};
 
-// 路線名整形（JR除去・複数路線対応）
 function formatLines(lines){
-  const clean=lines.map(l=>l.replace(/^JR/,'').replace(/線$/,'線').trim());
+  const clean=lines.map(l=>l.replace(/^JR/,'').trim());
   if(clean.length===1) return clean[0];
   if(clean.length===2) return clean.join(' / ');
   return clean.slice(0,2).join(' / ')+' ほか';
@@ -506,15 +531,14 @@ const STATIONS=Object.values(STATIONS_MAP)
 
 const isPc=()=>window.innerWidth>=768;
 
-// 地図（SPはzoomControl無効）
 const lmap=L.map('leaflet-map',{zoomControl:isPc()}).setView([35.665,139.720],11);
 L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',{
   attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>',maxZoom:18
 }).addTo(lmap);
 
-let stationData=STATIONS.map(s=>({...s})), markers=[];
+let stationData=STATIONS.map(s=>({...s})),markers=[];
 
-function lsKey(){return 'spcv6_'+document.getElementById('radiusSelect').value;}
+function lsKey(){return 'spcv7_'+document.getElementById('radiusSelect').value;}
 function saveLocal(d){try{localStorage.setItem(lsKey(),JSON.stringify(d));}catch(e){}}
 function loadLocal(){try{const s=localStorage.getItem(lsKey());return s?JSON.parse(s):null;}catch(e){return null;}}
 function setStatus(msg,anim){
@@ -573,7 +597,6 @@ async function loadAll(forceRefresh){
   }
 }
 
-// スマホ: 適度な密度（zoom+コンテナサイズ考慮）
 function getVisible(){
   const zoom=lmap.getZoom();
   const pref=document.getElementById('prefSelect').value;
@@ -584,9 +607,8 @@ function getVisible(){
     if(line&&!s.lines.includes(line)) return false;
     return true;
   });
-  // スマホはより細かく間引き、PC は少し緩める
-  const base=isPc()?1.0:1.4;
-  const d=(zoom>=14?22:zoom>=13?40:zoom>=12?65:zoom>=11?100:155)*base;
+  const base=isPc()?1.0:1.35;
+  const d=(zoom>=14?22:zoom>=13?40:zoom>=12?65:zoom>=11?100:152)*base;
   const sorted=[...f].sort((a,b)=>b.score-a.score);
   const vis=[];
   for(const st of sorted){
@@ -611,7 +633,7 @@ function drawMarker(st){
       <span style="font-weight:900;font-size:${sf}px;color:#fff;line-height:1.1">${st.score}</span>
       <span style="font-weight:700;font-size:${rf}px;color:${color};line-height:1">${rank}</span>
     </div>
-    <span style="font-size:${nf}px;color:rgba(255,255,255,0.88);white-space:nowrap;
+    <span style="font-size:${nf}px;color:rgba(255,255,255,0.9);white-space:nowrap;
       margin-top:2px;text-shadow:0 1px 5px rgba(0,0,0,0.95);font-weight:600">${st.name}</span>
   </div>`;
   const icon=L.divIcon({className:'',html,iconSize:[sz+64,sz+20],iconAnchor:[(sz+64)/2,sz/2]});
@@ -638,7 +660,7 @@ function showInfo(st){
       <span class="ip-axis-lbl">${name}</span>
       <div class="ip-axis-row">
         <div class="ip-track"><div class="ip-fill" style="width:${pct}%;background:${ac}"></div></div>
-        <span class="ip-pts" style="color:${ac}">${v.pts}<span style="font-size:8px;color:#304060">/${v.max}</span></span>
+        <span class="ip-pts" style="color:${ac}">${v.pts}<span style="font-size:8px;color:#6070a0">/${v.max}</span></span>
       </div>
     </div>`;
   }).join('');
@@ -648,10 +670,11 @@ function showInfo(st){
 function updateTable(filtered){
   const sorted=[...filtered].sort((a,b)=>b.score-a.score);
   const axes=['飲食','商業','生活','医療'];
-  const hdr=isPc()?`<div class="rank-header"><span>ランキング</span><span style="color:#4a6090">${sorted.length}駅</span></div>`:'';
+  const hdr=isPc()?`<div class="rank-header"><span>ランキング</span><span style="color:#8090b8">${sorted.length}駅</span></div>`:'';
   document.getElementById('table-area').innerHTML=hdr+sorted.map((st,i)=>{
     const{rank,color}=getRank(st.score);
     const d=st.details||{};
+    // 全4軸を1行・8px・overflow:hidden で完全1行化
     const cats=axes.map(n=>{
       const v=d[n]||{pts:0};
       return`<span class="rcat" style="background:${AC[n]}1a;color:${AC[n]};border:1px solid ${AC[n]}33">${n} ${v.pts}</span>`;
@@ -722,7 +745,6 @@ function setView(v){
 function openModal(){document.getElementById('modal-bg').classList.add('open');}
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
 
-// 地図移動開始でパネルを閉じる
 lmap.on('movestart',closeInfo);
 lmap.on('zoomend moveend',()=>{if(stationData.some(s=>s.score)) render();});
 document.getElementById('radiusSelect').addEventListener('change',()=>{
