@@ -6,36 +6,40 @@
 <title>街の戦闘力</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;700;900&family=Black+Ops+One&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto Sans JP',sans-serif}
 #app{display:flex;flex-direction:column;height:100vh}
 
-/* ── ヘッダー ── */
 #header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;height:54px;flex-shrink:0;
-  background:linear-gradient(135deg,#090d1e 0%,#0d1228 50%,#111830 100%);
-  border-bottom:1px solid rgba(120,140,255,0.12);
+  padding:0 16px;height:56px;flex-shrink:0;
+  background:linear-gradient(135deg,#07091a 0%,#0c1030 50%,#0f1438 100%);
+  border-bottom:1px solid rgba(100,140,255,0.15);
   z-index:2000;gap:10px;
-  box-shadow:0 2px 20px rgba(0,0,0,0.5)
+  box-shadow:0 2px 24px rgba(0,0,10,0.6)
 }
-.logo{display:flex;align-items:center;gap:12px;cursor:pointer;flex-shrink:0}
+.logo{display:flex;align-items:center;gap:11px;cursor:pointer;flex-shrink:0;text-decoration:none}
 .logo-main{
-  font-size:22px;font-weight:900;letter-spacing:3px;white-space:nowrap;
-  background:linear-gradient(110deg,#ffffff 0%,#e0e8ff 40%,#a0b8ff 80%);
+  font-family:'Black Ops One','Noto Sans JP',sans-serif;
+  font-size:22px;letter-spacing:3px;white-space:nowrap;
+  background:linear-gradient(110deg,#ffffff 0%,#e0ecff 30%,#a0c0ff 60%,#ff8888 85%,#ffaaaa 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  text-shadow:none;
-  filter:drop-shadow(0 0 12px rgba(120,160,255,0.3))
+  filter:drop-shadow(0 0 14px rgba(120,160,255,0.45))
+}
+.logo-sub{
+  font-size:9px;color:#8090c0;letter-spacing:2px;text-transform:uppercase;
+  border:1px solid rgba(100,130,220,0.3);padding:2px 7px;border-radius:10px;
+  background:rgba(80,110,200,0.08)
 }
 .info-btn{
-  font-size:11px;color:#c0d0ff;border:1px solid rgba(140,170,255,0.4);
+  font-size:10px;color:#b0c8ff;border:1px solid rgba(120,160,255,0.35);
   padding:4px 11px;border-radius:20px;cursor:pointer;white-space:nowrap;
-  background:rgba(100,130,255,0.1);transition:all 0.2s;font-family:inherit;font-weight:600
+  background:rgba(100,140,255,0.08);transition:all 0.2s;font-family:inherit;font-weight:600
 }
-.info-btn:hover{border-color:rgba(160,190,255,0.7);color:#e0eaff;background:rgba(100,130,255,0.2)}
+.info-btn:hover{border-color:rgba(160,200,255,0.6);color:#d0e8ff;background:rgba(100,140,255,0.16)}
 .hcontrols{display:flex;align-items:center;gap:7px;flex-shrink:0}
 .hsel{
   background:rgba(255,255,255,0.05);color:#d0d8f0;
@@ -44,24 +48,22 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
 }
 .view-tabs{display:flex;border:1px solid rgba(255,255,255,0.1);border-radius:9px;overflow:hidden}
 .vtab{
-  background:transparent;color:#7888a8;border:none;
+  background:transparent;color:#6878a8;border:none;
   padding:6px 13px;font-size:11px;cursor:pointer;
   transition:all 0.15s;white-space:nowrap;font-family:inherit;font-weight:600
 }
-.vtab.active{background:rgba(100,130,220,0.25);color:#e8eeff}
+.vtab.active{background:rgba(100,130,220,0.22);color:#e0eaff}
 .vtab:hover:not(.active){background:rgba(255,255,255,0.05);color:#b0c0e0}
 
-/* ── フィルターバー ── */
 #filters{
   display:flex;align-items:center;gap:8px;padding:5px 16px;
-  background:#080b16;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0
+  background:#07090f;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0
 }
-.flabel{font-size:10px;color:#6878a0;white-space:nowrap;letter-spacing:1.5px;text-transform:uppercase;font-weight:600}
+.flabel{font-size:10px;color:#6070a0;white-space:nowrap;letter-spacing:1.5px;text-transform:uppercase;font-weight:600}
 #statusbar{margin-left:auto;font-size:10px;color:#6878a0;white-space:nowrap;flex-shrink:0;font-weight:600}
 #statusbar.anim{color:#6090ff;animation:pulse 1.5s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+@keyframes pulse{0%,100%{opacity:0.35}50%{opacity:1}}
 
-/* ── コンテンツ ── */
 #content{flex:1;position:relative;overflow:hidden;display:flex}
 #map-area{position:relative;flex:1;min-width:0;overflow:hidden}
 #leaflet-map{width:100%;height:100%}
@@ -73,7 +75,7 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
   line-height:28px!important;font-size:14px!important}
 .leaflet-control-zoom a:hover{background:#141828!important;color:#d0e0ff!important}
 
-#table-area{width:380px;flex-shrink:0;overflow-y:auto;background:#080b16;
+#table-area{width:380px;flex-shrink:0;overflow-y:auto;background:#07090f;
   border-left:1px solid rgba(255,255,255,0.06);display:none}
 #map-area.hidden-mobile{display:none}
 #table-area.visible-mobile{display:block!important;position:absolute;inset:0;width:100%;border:none;z-index:10}
@@ -83,32 +85,28 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
   #btnMap,#btnTable{display:none!important}
   .leaflet-control-zoom{display:block!important}
 }
-@media(max-width:767px){
-  .leaflet-control-zoom{display:none!important}
-}
+@media(max-width:767px){.leaflet-control-zoom{display:none!important}}
 
-/* ── 凡例 ── */
 #legend{
   position:absolute;bottom:8px;left:8px;z-index:1000;
-  background:rgba(6,9,16,0.93);border:1px solid rgba(255,255,255,0.09);
+  background:rgba(6,9,18,0.93);border:1px solid rgba(255,255,255,0.09);
   border-radius:9px;padding:9px 12px;backdrop-filter:blur(10px)
 }
-.leg-title{font-size:9px;color:#6878a0;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;font-weight:700}
+.leg-title{font-size:8px;color:#6070a0;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;font-weight:700}
 .leg-item{display:flex;align-items:center;gap:7px;margin-bottom:3px;font-size:10px;color:#9098b8}
 .leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 @media(min-width:768px){
   #legend{bottom:20px;left:14px;padding:11px 14px}
-  .leg-title{font-size:9px;margin-bottom:8px}
-  .leg-item{font-size:10px;margin-bottom:4px}
+  .leg-item{margin-bottom:4px}
 }
 
-/* ── 詳細パネル（右下） ── */
+/* 詳細パネル：常に右下 */
 #info-panel{
-  position:absolute;bottom:8px;right:8px;z-index:1000;
-  background:rgba(6,9,16,0.97);border:1px solid rgba(255,255,255,0.1);
-  border-radius:13px;padding:15px;min-width:205px;max-width:245px;
+  position:absolute;bottom:8px;right:8px;z-index:1001;
+  background:rgba(6,9,18,0.97);border:1px solid rgba(255,255,255,0.1);
+  border-radius:13px;padding:15px;min-width:210px;max-width:250px;
   display:none;backdrop-filter:blur(16px);
-  box-shadow:0 8px 32px rgba(0,0,0,0.7)
+  box-shadow:0 8px 36px rgba(0,0,0,0.7)
 }
 @media(min-width:768px){
   #info-panel{bottom:20px;right:400px;padding:18px;min-width:220px;max-width:260px}
@@ -119,7 +117,7 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
 .ip-close{background:none;border:none;color:#6878a0;font-size:16px;cursor:pointer;padding:0}
 .ip-close:hover{color:#fff}
 .ip-score{font-size:48px;font-weight:900;line-height:1;letter-spacing:-2px}
-.ip-rank-lbl{font-size:10px;font-weight:700;margin-top:2px;margin-bottom:13px;letter-spacing:1.5px;text-transform:uppercase}
+.ip-rank-lbl{font-size:10px;font-weight:700;margin-top:2px;margin-bottom:13px;letter-spacing:1.5px}
 .ip-axes-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .ip-axis{display:flex;flex-direction:column;gap:3px}
 .ip-axis-lbl{font-size:9px;color:#7888a8;font-weight:600}
@@ -128,7 +126,6 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
 .ip-fill{height:3px;border-radius:2px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1)}
 .ip-pts{font-size:10px;font-weight:700;min-width:30px;text-align:right}
 
-/* ── ローディング ── */
 #loading{position:absolute;inset:0;display:none;
   align-items:center;justify-content:center;
   background:rgba(6,9,16,0.75);z-index:3000;backdrop-filter:blur(4px)}
@@ -138,7 +135,6 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
 .ld-txt{font-size:11px;color:#7888a8;font-weight:600;text-align:center}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── ランキング ── */
 .rank-header{
   padding:12px 16px 8px;border-bottom:1px solid rgba(255,255,255,0.06);
   font-size:10px;color:#8898b8;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;
@@ -153,28 +149,26 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
 .rank-row:hover{background:rgba(255,255,255,0.03)}
 .rn{font-size:14px;font-weight:900;width:26px;text-align:right;flex-shrink:0;
   font-variant-numeric:tabular-nums;color:#4a5878}
-.rn.top3{color:#6080a8;font-size:16px}
+.rn.top3{color:#6888b8;font-size:16px}
 .rbadge{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;
   justify-content:center;font-weight:900;font-size:11px;flex-shrink:0}
 .rinfo{flex:1;min-width:0}
 .rname{font-size:14px;font-weight:700;color:#e8eeff;letter-spacing:0.3px}
-.rline{font-size:9px;color:#6878a0;margin-top:2px}
-/* カテゴリを1行に */
+.rline{font-size:9px;color:#6070a0;margin-top:2px}
 .rcats{display:flex;gap:3px;margin-top:5px;flex-wrap:nowrap;overflow:hidden}
 .rcat{font-size:8px;padding:2px 5px;border-radius:3px;font-weight:700;white-space:nowrap;flex-shrink:0}
 .rscore{font-size:22px;font-weight:900;flex-shrink:0;letter-spacing:-0.5px;
   font-variant-numeric:tabular-nums;min-width:46px;text-align:right}
 
-/* ── モーダル ── */
 #modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:5000;
   display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
 #modal-bg.open{display:flex}
-#modal{background:#0b0f1e;border:1px solid rgba(255,255,255,0.1);border-radius:18px;
+#modal{background:#0a0e1e;border:1px solid rgba(255,255,255,0.1);border-radius:18px;
   padding:24px;width:340px;max-height:88vh;overflow-y:auto;
   box-shadow:0 24px 80px rgba(0,0,0,0.8)}
 .modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .modal-title{font-size:17px;font-weight:900;color:#fff}
-.modal-x{background:none;border:none;color:#8898b8;font-size:22px;cursor:pointer;font-family:inherit}
+.modal-x{background:none;border:none;color:#8090b8;font-size:22px;cursor:pointer;font-family:inherit}
 .modal-x:hover{color:#fff}
 .modal-desc{font-size:11px;color:#8898b8;margin-bottom:20px;line-height:1.85}
 .modal-ax{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;
@@ -184,7 +178,7 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
   justify-content:center;font-weight:900;font-size:16px;color:#fff;flex-shrink:0}
 .modal-ax-name{font-weight:700;font-size:13px;color:#e8eeff;margin-bottom:3px}
 .modal-ax-desc{font-size:10px;color:#8898b8;line-height:1.6}
-.modal-note{font-size:10px;color:#6070a0;margin-top:16px;line-height:1.9;
+.modal-note{font-size:10px;color:#5060a0;margin-top:16px;line-height:1.9;
   border-top:1px solid rgba(255,255,255,0.07);padding-top:14px}
 </style>
 </head>
@@ -193,14 +187,14 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
   <div id="header">
     <div class="logo" onclick="openModal()">
       <span class="logo-main">街の戦闘力</span>
-      <button class="info-btn">スコアの見方 ⓘ</button>
+      <span class="logo-sub">COMMERCIAL POWER</span>
     </div>
+    <button class="info-btn" onclick="openModal()">スコアの見方 ⓘ</button>
     <div class="hcontrols">
       <select class="hsel" id="radiusSelect">
-        <option value="500">500m</option>
-        <option value="800" selected>800m</option>
-        <option value="1000">1,000m</option>
-        <option value="1500">1,500m</option>
+        <option value="500" selected>500m</option>
+        <option value="800">800m</option>
+        <option value="1200">1,200m</option>
       </select>
       <div class="view-tabs">
         <button class="vtab active" id="btnMap" onclick="setView('map')">🗺 MAP</button>
@@ -263,9 +257,9 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
       <button class="modal-x" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-desc">
-      各駅から指定半径（デフォルト800m）圏内の商業施設数をもとに<strong style="color:#e8eeff">1000点満点</strong>で数値化。<br>
-      <strong style="color:#a0b8ff">対数スケール</strong>採用により、施設数トップ駅が突出しすぎない自然なランク分布になります。<br><br>
-      データ：<strong style="color:#a0b8ff">Overture Maps</strong>（Meta・Microsoft・Amazon等提供）
+      各駅から指定半径圏内の商業施設数をもとに<strong style="color:#e8eeff">1000点満点</strong>で数値化。<br>
+      <strong style="color:#a0c0ff">対数スケール</strong>採用により自然なランク分布になります。<br><br>
+      データ：<strong style="color:#a0c0ff">Overture Maps</strong>（Meta・Microsoft・Amazon等提供）
     </div>
     <div class="modal-ax">
       <div class="modal-pt" style="background:linear-gradient(135deg,#ff3355,#ff6080)">350</div>
@@ -297,7 +291,6 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// Eランク廃止・D=0〜199
 const RANKS=[
   {rank:'S',color:'#ff2244',glow:'#ff224455',min:800},
   {rank:'A',color:'#ff8800',glow:'#ff880050',min:600},
@@ -308,8 +301,12 @@ const RANKS=[
 function getRank(s){return RANKS.find(r=>s>=r.min)||RANKS[4];}
 const AC={'飲食':'#ff4466','商業':'#9070ff','生活':'#3aa0ff','医療':'#f09030'};
 
+// 路線名整形（東京メトロ省略・JR省略・都営省略なし）
+function cleanLine(l){
+  return l.replace('東京メトロ','').replace(/^JR/,'').trim();
+}
 function formatLines(lines){
-  const clean=lines.map(l=>l.replace(/^JR/,'').trim());
+  const clean=lines.map(cleanLine);
   if(clean.length===1) return clean[0];
   if(clean.length===2) return clean.join(' / ');
   return clean.slice(0,2).join(' / ')+' ほか';
@@ -364,6 +361,7 @@ const LINE_DATA={
   }
 };
 
+// 起動時に全路線を展開（バグ修正：初期状態でも全路線を表示できるよう）
 const ALL_LINES={};
 Object.values(LINE_DATA).forEach(lines=>{
   Object.entries(lines).forEach(([l,s])=>{ALL_LINES[l]=s;});
@@ -538,7 +536,7 @@ L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',{
 
 let stationData=STATIONS.map(s=>({...s})),markers=[];
 
-function lsKey(){return 'spcv7_'+document.getElementById('radiusSelect').value;}
+function lsKey(){return 'spcv8_'+document.getElementById('radiusSelect').value;}
 function saveLocal(d){try{localStorage.setItem(lsKey(),JSON.stringify(d));}catch(e){}}
 function loadLocal(){try{const s=localStorage.getItem(lsKey());return s?JSON.parse(s):null;}catch(e){return null;}}
 function setStatus(msg,anim){
@@ -608,7 +606,7 @@ function getVisible(){
     return true;
   });
   const base=isPc()?1.0:1.35;
-  const d=(zoom>=14?22:zoom>=13?40:zoom>=12?65:zoom>=11?100:152)*base;
+  const d=(zoom>=14?22:zoom>=13?40:zoom>=12?65:zoom>=11?100:150)*base;
   const sorted=[...f].sort((a,b)=>b.score-a.score);
   const vis=[];
   for(const st of sorted){
@@ -660,7 +658,7 @@ function showInfo(st){
       <span class="ip-axis-lbl">${name}</span>
       <div class="ip-axis-row">
         <div class="ip-track"><div class="ip-fill" style="width:${pct}%;background:${ac}"></div></div>
-        <span class="ip-pts" style="color:${ac}">${v.pts}<span style="font-size:8px;color:#6070a0">/${v.max}</span></span>
+        <span class="ip-pts" style="color:${ac}">${v.pts}<span style="font-size:8px;color:#5060a0">/${v.max}</span></span>
       </div>
     </div>`;
   }).join('');
@@ -670,11 +668,10 @@ function showInfo(st){
 function updateTable(filtered){
   const sorted=[...filtered].sort((a,b)=>b.score-a.score);
   const axes=['飲食','商業','生活','医療'];
-  const hdr=isPc()?`<div class="rank-header"><span>ランキング</span><span style="color:#8090b8">${sorted.length}駅</span></div>`:'';
+  const hdr=isPc()?`<div class="rank-header"><span>ランキング</span><span style="color:#7888b0">${sorted.length}駅</span></div>`:'';
   document.getElementById('table-area').innerHTML=hdr+sorted.map((st,i)=>{
     const{rank,color}=getRank(st.score);
     const d=st.details||{};
-    // 全4軸を1行・8px・overflow:hidden で完全1行化
     const cats=axes.map(n=>{
       const v=d[n]||{pts:0};
       return`<span class="rcat" style="background:${AC[n]}1a;color:${AC[n]};border:1px solid ${AC[n]}33">${n} ${v.pts}</span>`;
@@ -701,13 +698,26 @@ function onTableClick(name,pref){
   showInfo(st);
 }
 
+// バグ修正：初期状態でも全路線を表示
+function initLineSelect(){
+  const ls=document.getElementById('lineSelect');
+  ls.innerHTML='<option value="">全路線</option>';
+  Object.keys(ALL_LINES).sort().forEach(line=>{
+    const o=document.createElement('option');
+    o.value=line;o.textContent=cleanLine(line);
+    ls.appendChild(o);
+  });
+}
+
 function onPrefChange(){
   const pref=document.getElementById('prefSelect').value;
   const ls=document.getElementById('lineSelect');
   ls.innerHTML='<option value="">全路線</option>';
-  Object.keys(pref?LINE_DATA[pref]:ALL_LINES||{}).forEach(line=>{
+  const src=pref?LINE_DATA[pref]:ALL_LINES;
+  Object.keys(src||{}).sort().forEach(line=>{
     const o=document.createElement('option');
-    o.value=line;o.textContent=line;ls.appendChild(o);
+    o.value=line;o.textContent=cleanLine(line);
+    ls.appendChild(o);
   });
   render();
 }
@@ -758,6 +768,8 @@ if(isPc()){
   document.getElementById('table-area').style.display='block';
 }
 
+// 路線リストを初期化してからロード
+initLineSelect();
 loadAll(false);
 </script>
 </body>
