@@ -6,64 +6,76 @@
 <title>街の戦闘力</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;700;900&family=Black+Ops+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;700;900&family=Rajdhani:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto Sans JP',sans-serif}
 #app{display:flex;flex-direction:column;height:100vh}
 
+/* ── ヘッダー ── */
 #header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;height:56px;flex-shrink:0;
-  background:linear-gradient(135deg,#07091a 0%,#0c1030 50%,#0f1438 100%);
-  border-bottom:1px solid rgba(100,140,255,0.15);
-  z-index:2000;gap:10px;
-  box-shadow:0 2px 24px rgba(0,0,10,0.6)
+  display:flex;align-items:center;padding:0 14px;height:50px;flex-shrink:0;
+  background:linear-gradient(135deg,#070920 0%,#0c1235 50%,#0f163a 100%);
+  border-bottom:1px solid rgba(80,120,255,0.18);z-index:2000;gap:8px;
+  box-shadow:0 2px 20px rgba(0,0,0,0.6)
 }
-.logo{display:flex;align-items:center;gap:11px;cursor:pointer;flex-shrink:0;text-decoration:none}
+.logo{display:flex;align-items:center;flex-shrink:0;cursor:pointer}
 .logo-main{
-  font-family:'Black Ops One','Noto Sans JP',sans-serif;
-  font-size:22px;letter-spacing:3px;white-space:nowrap;
-  background:linear-gradient(110deg,#ffffff 0%,#e0ecff 30%,#a0c0ff 60%,#ff8888 85%,#ffaaaa 100%);
+  font-family:'Rajdhani','Noto Sans JP',sans-serif;
+  font-size:26px;font-weight:700;letter-spacing:4px;white-space:nowrap;
+  background:linear-gradient(110deg,#ff4060 0%,#ff9944 35%,#ffe566 60%,#ffffff 85%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 0 14px rgba(120,160,255,0.45))
-}
-.logo-sub{
-  font-size:9px;color:#8090c0;letter-spacing:2px;text-transform:uppercase;
-  border:1px solid rgba(100,130,220,0.3);padding:2px 7px;border-radius:10px;
-  background:rgba(80,110,200,0.08)
+  filter:drop-shadow(0 0 16px rgba(255,120,60,0.5))
 }
 .info-btn{
-  font-size:10px;color:#b0c8ff;border:1px solid rgba(120,160,255,0.35);
-  padding:4px 11px;border-radius:20px;cursor:pointer;white-space:nowrap;
-  background:rgba(100,140,255,0.08);transition:all 0.2s;font-family:inherit;font-weight:600
+  font-size:10px;color:#b0c4ff;border:1px solid rgba(100,140,255,0.3);
+  padding:3px 9px;border-radius:16px;cursor:pointer;white-space:nowrap;
+  background:rgba(80,110,255,0.08);transition:all 0.2s;font-family:inherit;font-weight:600;
+  flex-shrink:0
 }
-.info-btn:hover{border-color:rgba(160,200,255,0.6);color:#d0e8ff;background:rgba(100,140,255,0.16)}
-.hcontrols{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.info-btn:hover{border-color:rgba(150,190,255,0.55);color:#d8eaff;background:rgba(80,110,255,0.16)}
+.hspacer{flex:1}
+.hcontrols{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .hsel{
-  background:rgba(255,255,255,0.05);color:#d0d8f0;
+  background:rgba(255,255,255,0.05);color:#c8d4f0;
   border:1px solid rgba(255,255,255,0.1);
-  padding:5px 8px;border-radius:8px;font-size:11px;cursor:pointer;outline:none;font-family:inherit
+  padding:5px 7px;border-radius:7px;font-size:11px;cursor:pointer;outline:none;font-family:inherit
 }
-.view-tabs{display:flex;border:1px solid rgba(255,255,255,0.1);border-radius:9px;overflow:hidden}
+.view-tabs{display:flex;border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden}
 .vtab{
-  background:transparent;color:#6878a8;border:none;
-  padding:6px 13px;font-size:11px;cursor:pointer;
-  transition:all 0.15s;white-space:nowrap;font-family:inherit;font-weight:600
+  background:transparent;color:#6070a0;border:none;
+  padding:5px 11px;font-size:11px;cursor:pointer;transition:all 0.15s;
+  white-space:nowrap;font-family:inherit;font-weight:600
 }
-.vtab.active{background:rgba(100,130,220,0.22);color:#e0eaff}
-.vtab:hover:not(.active){background:rgba(255,255,255,0.05);color:#b0c0e0}
+.vtab.active{background:rgba(80,110,230,0.25);color:#d8e8ff}
+.vtab:hover:not(.active){background:rgba(255,255,255,0.05);color:#a8bce0}
 
+/* ── フィルターバー ── */
 #filters{
-  display:flex;align-items:center;gap:8px;padding:5px 16px;
-  background:#07090f;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0
+  display:flex;align-items:center;gap:6px;padding:4px 14px;
+  background:#060914;border-bottom:1px solid rgba(255,255,255,0.05);
+  flex-shrink:0;overflow-x:auto
 }
-.flabel{font-size:10px;color:#6070a0;white-space:nowrap;letter-spacing:1.5px;text-transform:uppercase;font-weight:600}
-#statusbar{margin-left:auto;font-size:10px;color:#6878a0;white-space:nowrap;flex-shrink:0;font-weight:600}
-#statusbar.anim{color:#6090ff;animation:pulse 1.5s ease-in-out infinite}
+.flabel{font-size:9px;color:#506090;white-space:nowrap;letter-spacing:1.5px;text-transform:uppercase;font-weight:700}
+#searchInput{
+  background:rgba(255,255,255,0.05);color:#c8d4f0;
+  border:1px solid rgba(255,255,255,0.1);
+  padding:4px 8px;border-radius:7px;font-size:11px;outline:none;
+  font-family:inherit;width:110px;transition:border-color 0.2s
+}
+#searchInput::placeholder{color:#405080}
+#searchInput:focus{border-color:rgba(100,150,255,0.4)}
+#rankFilter{
+  background:rgba(255,255,255,0.05);color:#c8d4f0;
+  border:1px solid rgba(255,255,255,0.1);
+  padding:4px 7px;border-radius:7px;font-size:11px;cursor:pointer;outline:none;font-family:inherit
+}
+#statusbar{margin-left:auto;font-size:10px;color:#5878a8;white-space:nowrap;flex-shrink:0;font-weight:600}
+#statusbar.anim{color:#5a90ff;animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:0.35}50%{opacity:1}}
 
+/* ── コンテンツ ── */
 #content{flex:1;position:relative;overflow:hidden;display:flex}
 #map-area{position:relative;flex:1;min-width:0;overflow:hidden}
 #leaflet-map{width:100%;height:100%}
@@ -75,111 +87,173 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
   line-height:28px!important;font-size:14px!important}
 .leaflet-control-zoom a:hover{background:#141828!important;color:#d0e0ff!important}
 
-#table-area{width:380px;flex-shrink:0;overflow-y:auto;background:#07090f;
-  border-left:1px solid rgba(255,255,255,0.06);display:none}
+/* ランキングパネル */
+#table-area{
+  width:390px;flex-shrink:0;overflow-y:auto;background:#060914;
+  border-left:1px solid rgba(255,255,255,0.06);display:none;
+  display:flex;flex-direction:column
+}
 #map-area.hidden-mobile{display:none}
-#table-area.visible-mobile{display:block!important;position:absolute;inset:0;width:100%;border:none;z-index:10}
+#table-area.visible-mobile{
+  display:flex!important;flex-direction:column!important;
+  position:absolute!important;inset:0!important;width:100%!important;
+  border:none!important;z-index:10
+}
 
 @media(min-width:768px){
-  #table-area{display:block!important;position:static!important;width:380px!important}
+  #table-area{display:flex!important;position:static!important;width:390px!important}
   #btnMap,#btnTable{display:none!important}
   .leaflet-control-zoom{display:block!important}
 }
-@media(max-width:767px){.leaflet-control-zoom{display:none!important}}
+@media(max-width:767px){
+  .leaflet-control-zoom{display:none!important}
+}
 
+/* GPS ボタン */
+#gpsBtn{
+  position:absolute;top:14px;right:14px;z-index:1000;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(8,12,24,0.92);border:1px solid rgba(255,255,255,0.12);
+  color:#8898c0;font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);transition:all 0.2s
+}
+#gpsBtn:hover{border-color:rgba(100,160,255,0.4);color:#a0c8ff}
+
+/* 凡例 */
 #legend{
   position:absolute;bottom:8px;left:8px;z-index:1000;
-  background:rgba(6,9,18,0.93);border:1px solid rgba(255,255,255,0.09);
+  background:rgba(5,8,18,0.93);border:1px solid rgba(255,255,255,0.09);
   border-radius:9px;padding:9px 12px;backdrop-filter:blur(10px)
 }
-.leg-title{font-size:8px;color:#6070a0;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;font-weight:700}
-.leg-item{display:flex;align-items:center;gap:7px;margin-bottom:3px;font-size:10px;color:#9098b8}
+.leg-title{font-size:8px;color:#5060a0;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;font-weight:700}
+.leg-item{display:flex;align-items:center;gap:7px;margin-bottom:3px;font-size:10px;color:#8898b8}
 .leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-@media(min-width:768px){
-  #legend{bottom:20px;left:14px;padding:11px 14px}
-  .leg-item{margin-bottom:4px}
-}
 
-/* 詳細パネル：常に右下 */
+/* ── 詳細パネル（常に地図エリア右下） ── */
 #info-panel{
-  position:absolute;bottom:8px;right:8px;z-index:1001;
-  background:rgba(6,9,18,0.97);border:1px solid rgba(255,255,255,0.1);
-  border-radius:13px;padding:15px;min-width:210px;max-width:250px;
-  display:none;backdrop-filter:blur(16px);
+  position:absolute;
+  bottom:8px;
+  right:8px;
+  z-index:1001;
+  background:rgba(5,8,20,0.97);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:13px;padding:15px;
+  min-width:215px;max-width:255px;
+  display:none;
+  backdrop-filter:blur(16px);
   box-shadow:0 8px 36px rgba(0,0,0,0.7)
-}
-@media(min-width:768px){
-  #info-panel{bottom:20px;right:400px;padding:18px;min-width:220px;max-width:260px}
 }
 .ip-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px}
 .ip-name{font-size:17px;font-weight:900;color:#fff;letter-spacing:0.5px}
-.ip-line{font-size:9px;color:#6878a0;margin-top:3px;line-height:1.5}
-.ip-close{background:none;border:none;color:#6878a0;font-size:16px;cursor:pointer;padding:0}
+.ip-line{font-size:9px;color:#6070a0;margin-top:3px;line-height:1.5}
+.ip-actions{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.ip-close{background:none;border:none;color:#506080;font-size:16px;cursor:pointer;padding:0}
 .ip-close:hover{color:#fff}
+.ip-fav{background:none;border:none;font-size:15px;cursor:pointer;padding:0;transition:transform 0.15s}
+.ip-fav:hover{transform:scale(1.3)}
+.ip-share{background:none;border:1px solid rgba(100,140,255,0.25);color:#8090c0;
+  font-size:9px;padding:2px 7px;border-radius:10px;cursor:pointer;font-family:inherit;font-weight:600}
+.ip-share:hover{border-color:rgba(100,180,255,0.5);color:#a0c0ff}
 .ip-score{font-size:48px;font-weight:900;line-height:1;letter-spacing:-2px}
-.ip-rank-lbl{font-size:10px;font-weight:700;margin-top:2px;margin-bottom:13px;letter-spacing:1.5px}
+.ip-rank-lbl{font-size:10px;font-weight:700;margin-top:2px;margin-bottom:12px;letter-spacing:1.5px}
+/* 近隣駅 */
+.ip-nearby{margin-bottom:12px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06)}
+.ip-nearby-title{font-size:8px;color:#506090;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;font-weight:700}
+.ip-nearby-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;font-size:10px}
+.ip-nearby-name{color:#a0b0d0}
+.ip-nearby-score{font-weight:700}
+/* 4軸グリッド */
 .ip-axes-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .ip-axis{display:flex;flex-direction:column;gap:3px}
-.ip-axis-lbl{font-size:9px;color:#7888a8;font-weight:600}
+.ip-axis-lbl{font-size:9px;color:#6878a8;font-weight:600}
 .ip-axis-row{display:flex;align-items:center;gap:5px}
 .ip-track{flex:1;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden}
 .ip-fill{height:3px;border-radius:2px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1)}
 .ip-pts{font-size:10px;font-weight:700;min-width:30px;text-align:right}
 
+/* ローディング */
 #loading{position:absolute;inset:0;display:none;
   align-items:center;justify-content:center;
-  background:rgba(6,9,16,0.75);z-index:3000;backdrop-filter:blur(4px)}
+  background:rgba(5,8,18,0.75);z-index:3000;backdrop-filter:blur(4px)}
 #loading.show{display:flex}
 .ld-ring{width:36px;height:36px;border:2px solid rgba(255,255,255,0.07);
-  border-top-color:#6090ff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}
-.ld-txt{font-size:11px;color:#7888a8;font-weight:600;text-align:center}
+  border-top-color:#5a80ff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}
+.ld-txt{font-size:11px;color:#6878a8;font-weight:600;text-align:center}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.rank-header{
-  padding:12px 16px 8px;border-bottom:1px solid rgba(255,255,255,0.06);
-  font-size:10px;color:#8898b8;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;
-  display:flex;justify-content:space-between;align-items:center
+/* ── ランキング ── */
+/* カテゴリタブ */
+#rank-tabs{
+  display:flex;border-bottom:1px solid rgba(255,255,255,0.07);
+  flex-shrink:0;overflow-x:auto;background:#060914
 }
+.rank-tab{
+  background:transparent;border:none;color:#5060a0;
+  padding:9px 12px;font-size:10px;cursor:pointer;
+  transition:all 0.15s;white-space:nowrap;font-family:inherit;font-weight:700;
+  letter-spacing:1px;border-bottom:2px solid transparent;flex-shrink:0
+}
+.rank-tab.active{color:#e0eaff;border-bottom-color:#5a80ff}
+.rank-tab:hover:not(.active){color:#8898c0}
+
+.rank-header{
+  padding:10px 14px 7px;border-bottom:1px solid rgba(255,255,255,0.06);
+  font-size:10px;color:#7888b8;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0
+}
+.rank-avg{font-size:10px;color:#6080c0;font-weight:600;letter-spacing:0}
+
+#rank-list{flex:1;overflow-y:auto}
 .rank-row{
-  display:flex;align-items:center;gap:10px;
-  padding:9px 14px;
-  border-bottom:1px solid rgba(255,255,255,0.04);
-  cursor:pointer;transition:background 0.12s
+  display:flex;align-items:center;gap:9px;padding:9px 14px;
+  border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.12s
 }
 .rank-row:hover{background:rgba(255,255,255,0.03)}
-.rn{font-size:14px;font-weight:900;width:26px;text-align:right;flex-shrink:0;
-  font-variant-numeric:tabular-nums;color:#4a5878}
-.rn.top3{color:#6888b8;font-size:16px}
-.rbadge{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;
+.rn{font-size:14px;font-weight:900;width:24px;text-align:right;flex-shrink:0;
+  font-variant-numeric:tabular-nums;color:#3a4870}
+.rn.top3{color:#5878a8;font-size:16px}
+.rbadge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
   justify-content:center;font-weight:900;font-size:11px;flex-shrink:0}
 .rinfo{flex:1;min-width:0}
-.rname{font-size:14px;font-weight:700;color:#e8eeff;letter-spacing:0.3px}
-.rline{font-size:9px;color:#6070a0;margin-top:2px}
+.rname{font-size:13px;font-weight:700;color:#e0eaff;letter-spacing:0.3px}
+.rname-row{display:flex;align-items:center;gap:5px}
+.rfav{font-size:12px;cursor:pointer;line-height:1;flex-shrink:0}
+.rfav:hover{transform:scale(1.3)}
+.rline{font-size:9px;color:#506090;margin-top:2px}
 .rcats{display:flex;gap:3px;margin-top:5px;flex-wrap:nowrap;overflow:hidden}
 .rcat{font-size:8px;padding:2px 5px;border-radius:3px;font-weight:700;white-space:nowrap;flex-shrink:0}
-.rscore{font-size:22px;font-weight:900;flex-shrink:0;letter-spacing:-0.5px;
-  font-variant-numeric:tabular-nums;min-width:46px;text-align:right}
+.rscore{font-size:21px;font-weight:900;flex-shrink:0;letter-spacing:-0.5px;
+  font-variant-numeric:tabular-nums;min-width:44px;text-align:right}
 
-#modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:5000;
+/* モーダル */
+#modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.86);z-index:5000;
   display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
 #modal-bg.open{display:flex}
-#modal{background:#0a0e1e;border:1px solid rgba(255,255,255,0.1);border-radius:18px;
+#modal{background:#090d1e;border:1px solid rgba(255,255,255,0.1);border-radius:18px;
   padding:24px;width:340px;max-height:88vh;overflow-y:auto;
   box-shadow:0 24px 80px rgba(0,0,0,0.8)}
 .modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .modal-title{font-size:17px;font-weight:900;color:#fff}
-.modal-x{background:none;border:none;color:#8090b8;font-size:22px;cursor:pointer;font-family:inherit}
+.modal-x{background:none;border:none;color:#7888b0;font-size:22px;cursor:pointer;font-family:inherit}
 .modal-x:hover{color:#fff}
-.modal-desc{font-size:11px;color:#8898b8;margin-bottom:20px;line-height:1.85}
+.modal-desc{font-size:11px;color:#8090b8;margin-bottom:20px;line-height:1.85}
 .modal-ax{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;
   padding:12px 13px;background:rgba(255,255,255,0.03);
   border-radius:10px;border:1px solid rgba(255,255,255,0.07)}
 .modal-pt{width:44px;height:44px;border-radius:9px;display:flex;align-items:center;
   justify-content:center;font-weight:900;font-size:16px;color:#fff;flex-shrink:0}
-.modal-ax-name{font-weight:700;font-size:13px;color:#e8eeff;margin-bottom:3px}
-.modal-ax-desc{font-size:10px;color:#8898b8;line-height:1.6}
-.modal-note{font-size:10px;color:#5060a0;margin-top:16px;line-height:1.9;
+.modal-ax-name{font-weight:700;font-size:13px;color:#e0eaff;margin-bottom:3px}
+.modal-ax-desc{font-size:10px;color:#8090b8;line-height:1.6}
+.modal-note{font-size:10px;color:#4050a0;margin-top:16px;line-height:1.9;
   border-top:1px solid rgba(255,255,255,0.07);padding-top:14px}
+
+/* お気に入りフィルター */
+#favFilter{
+  background:none;border:none;color:#5060a0;font-size:16px;cursor:pointer;
+  padding:0 2px;transition:color 0.15s;flex-shrink:0
+}
+#favFilter.on{color:#ff6688}
 </style>
 </head>
 <body>
@@ -187,9 +261,9 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
   <div id="header">
     <div class="logo" onclick="openModal()">
       <span class="logo-main">街の戦闘力</span>
-      <span class="logo-sub">COMMERCIAL POWER</span>
     </div>
     <button class="info-btn" onclick="openModal()">スコアの見方 ⓘ</button>
+    <div class="hspacer"></div>
     <div class="hcontrols">
       <select class="hsel" id="radiusSelect">
         <option value="500" selected>500m</option>
@@ -197,13 +271,15 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
         <option value="1200">1,200m</option>
       </select>
       <div class="view-tabs">
-        <button class="vtab active" id="btnMap" onclick="setView('map')">🗺 MAP</button>
-        <button class="vtab" id="btnTable" onclick="setView('table')">📊 ランキング</button>
+        <button class="vtab active" id="btnMap" onclick="setView('map')">🗺</button>
+        <button class="vtab" id="btnTable" onclick="setView('table')">📊</button>
       </div>
     </div>
   </div>
+
   <div id="filters">
-    <span class="flabel">絞り込み</span>
+    <span class="flabel">絞込</span>
+    <input type="text" id="searchInput" placeholder="駅名検索..." oninput="render()">
     <select class="hsel" id="prefSelect" onchange="onPrefChange()">
       <option value="">全エリア</option>
       <option value="東京都">東京都</option>
@@ -214,11 +290,22 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
     <select class="hsel" id="lineSelect" onchange="render()">
       <option value="">全路線</option>
     </select>
+    <select id="rankFilter" onchange="render()">
+      <option value="">全ランク</option>
+      <option value="S">S</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+    </select>
+    <button id="favFilter" title="お気に入りのみ" onclick="toggleFavFilter()">♡</button>
     <span id="statusbar"></span>
   </div>
+
   <div id="content">
     <div id="map-area">
       <div id="leaflet-map"></div>
+      <button id="gpsBtn" onclick="gotoCurrentLocation()" title="現在地">📍</button>
       <div id="legend">
         <div class="leg-title">戦闘力ランク</div>
         <div class="leg-item"><div class="leg-dot" style="background:#ff2244;box-shadow:0 0 7px #ff224466"></div>S　800〜1000</div>
@@ -229,14 +316,19 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
       </div>
       <div id="info-panel">
         <div class="ip-head">
-          <div>
+          <div style="flex:1;min-width:0">
             <div class="ip-name" id="ip-name"></div>
             <div class="ip-line" id="ip-line"></div>
           </div>
-          <button class="ip-close" onclick="closeInfo()">✕</button>
+          <div class="ip-actions">
+            <button class="ip-fav" id="ip-fav-btn" onclick="toggleFav(currentStation)">♡</button>
+            <button class="ip-share" onclick="shareStation()">X 共有</button>
+            <button class="ip-close" onclick="closeInfo()">✕</button>
+          </div>
         </div>
         <div class="ip-score" id="ip-score"></div>
         <div class="ip-rank-lbl" id="ip-rank"></div>
+        <div class="ip-nearby" id="ip-nearby"></div>
         <div class="ip-axes-grid" id="ip-axes"></div>
       </div>
       <div id="loading">
@@ -246,7 +338,21 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
         </div>
       </div>
     </div>
-    <div id="table-area"></div>
+
+    <div id="table-area">
+      <div id="rank-tabs">
+        <button class="rank-tab active" data-axis="総合" onclick="setRankAxis('総合')">総合</button>
+        <button class="rank-tab" data-axis="飲食" onclick="setRankAxis('飲食')">飲食</button>
+        <button class="rank-tab" data-axis="商業" onclick="setRankAxis('商業')">商業</button>
+        <button class="rank-tab" data-axis="生活" onclick="setRankAxis('生活')">生活</button>
+        <button class="rank-tab" data-axis="医療" onclick="setRankAxis('医療')">医療</button>
+      </div>
+      <div class="rank-header">
+        <span id="rank-header-txt">ランキング</span>
+        <span class="rank-avg" id="rank-avg"></span>
+      </div>
+      <div id="rank-list"></div>
+    </div>
   </div>
 </div>
 
@@ -257,34 +363,34 @@ html,body{height:100%;background:#060910;color:#e2e6f0;font-family:'Inter','Noto
       <button class="modal-x" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-desc">
-      各駅から指定半径圏内の商業施設数をもとに<strong style="color:#e8eeff">1000点満点</strong>で数値化。<br>
+      各駅から指定半径圏内の商業施設数をもとに<strong style="color:#e0eaff">1000点満点</strong>で数値化。<br>
       <strong style="color:#a0c0ff">対数スケール</strong>採用により自然なランク分布になります。<br><br>
       データ：<strong style="color:#a0c0ff">Overture Maps</strong>（Meta・Microsoft・Amazon等提供）
     </div>
     <div class="modal-ax">
       <div class="modal-pt" style="background:linear-gradient(135deg,#ff3355,#ff6080)">350</div>
       <div><div class="modal-ax-name">飲食充実</div>
-      <div class="modal-ax-desc">飲食店・カフェ・バー・ファストフード等。施設数最多の駅を基準に対数評価</div></div>
+      <div class="modal-ax-desc">飲食店・カフェ・バー・ファストフード等</div></div>
     </div>
     <div class="modal-ax">
       <div class="modal-pt" style="background:linear-gradient(135deg,#7b5fe8,#a080ff)">350</div>
       <div><div class="modal-ax-name">商業・小売</div>
-      <div class="modal-ax-desc">百貨店・ショッピング・アパレル・娯楽施設等。施設数最多の駅を基準に対数評価</div></div>
+      <div class="modal-ax-desc">百貨店・ショッピング・アパレル・娯楽施設等</div></div>
     </div>
     <div class="modal-ax">
       <div class="modal-pt" style="background:linear-gradient(135deg,#2a8fd4,#50b8ff)">200</div>
       <div><div class="modal-ax-name">生活利便</div>
-      <div class="modal-ax-desc">コンビニ・スーパー・薬局・銀行・美容院等。施設数最多の駅を基準に対数評価</div></div>
+      <div class="modal-ax-desc">コンビニ・スーパー・薬局・銀行・美容院等</div></div>
     </div>
     <div class="modal-ax">
       <div class="modal-pt" style="background:linear-gradient(135deg,#d07000,#f09830)">100</div>
       <div><div class="modal-ax-name">医療・福祉</div>
-      <div class="modal-ax-desc">病院・クリニック・歯科・調剤薬局等。施設数最多の駅を基準に対数評価</div></div>
+      <div class="modal-ax-desc">病院・クリニック・歯科・調剤薬局等</div></div>
     </div>
     <div class="modal-note">
-      ※ スコアはエリア内相対評価。対象エリア変更でランクが変わる場合があります。<br>
-      ※ 本スコアは商業施設密度のみを反映。居住環境・治安・家賃等は含みません。<br>
-      ※ Overture Mapsデータは月次更新。スコアは自動反映されます。
+      ※ 各軸は「施設数最多の駅を基準とした対数相対評価」です。<br>
+      ※ 本スコアは商業施設密度のみを反映。居住環境・治安等は含みません。<br>
+      ※ Overture Mapsデータは月次更新。
     </div>
   </div>
 </div>
@@ -301,15 +407,73 @@ const RANKS=[
 function getRank(s){return RANKS.find(r=>s>=r.min)||RANKS[4];}
 const AC={'飲食':'#ff4466','商業':'#9070ff','生活':'#3aa0ff','医療':'#f09030'};
 
-// 路線名整形（東京メトロ省略・JR省略・都営省略なし）
-function cleanLine(l){
-  return l.replace('東京メトロ','').replace(/^JR/,'').trim();
-}
+function cleanLine(l){return l.replace('東京メトロ','').replace(/^JR/,'').trim();}
 function formatLines(lines){
-  const clean=lines.map(cleanLine);
-  if(clean.length===1) return clean[0];
-  if(clean.length===2) return clean.join(' / ');
-  return clean.slice(0,2).join(' / ')+' ほか';
+  const c=lines.map(cleanLine);
+  if(c.length===1) return c[0];
+  if(c.length===2) return c.join(' / ');
+  return c.slice(0,2).join(' / ')+' ほか';
+}
+
+// ── お気に入り ──
+let favs=new Set(JSON.parse(localStorage.getItem('spc_favs')||'[]'));
+let showFavOnly=false;
+function isFav(st){return favs.has(st.name+'_'+st.pref);}
+function toggleFav(st){
+  if(!st) return;
+  const k=st.name+'_'+st.pref;
+  if(favs.has(k)) favs.delete(k); else favs.add(k);
+  localStorage.setItem('spc_favs',JSON.stringify([...favs]));
+  updateFavBtn(st);
+  render();
+}
+function updateFavBtn(st){
+  const btn=document.getElementById('ip-fav-btn');
+  if(btn) btn.textContent=isFav(st)?'♥':'♡';
+}
+function toggleFavFilter(){
+  showFavOnly=!showFavOnly;
+  document.getElementById('favFilter').classList.toggle('on',showFavOnly);
+  render();
+}
+
+// ── Xシェア ──
+let currentStation=null;
+function shareStation(){
+  if(!currentStation) return;
+  const txt=`${currentStation.name}駅の戦闘力は ${currentStation.score}点（${getRank(currentStation.score).rank}ランク）！ #街の戦闘力`;
+  const url='https://twitter.com/intent/tweet?text='+encodeURIComponent(txt)+
+    '&url='+encodeURIComponent('https://street-power-production.up.railway.app');
+  window.open(url,'_blank');
+}
+
+// ── ランキング軸 ──
+let rankAxis='総合';
+function setRankAxis(axis){
+  rankAxis=axis;
+  document.querySelectorAll('.rank-tab').forEach(t=>t.classList.toggle('active',t.dataset.axis===axis));
+  render();
+}
+function getAxisScore(st){
+  if(rankAxis==='総合') return st.score||0;
+  return (st.details&&st.details[rankAxis])?st.details[rankAxis].pts:0;
+}
+
+// ── GPS ──
+function gotoCurrentLocation(){
+  if(!navigator.geolocation){alert('位置情報が使えません');return;}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const{latitude:lat,longitude:lng}=pos.coords;
+    lmap.setView([lat,lng],14);
+    // 最寄り駅を探す
+    let nearest=null,minDist=Infinity;
+    stationData.forEach(st=>{
+      if(!st.score) return;
+      const d=Math.hypot(st.lat-lat,st.lng-lng);
+      if(d<minDist){minDist=d;nearest=st;}
+    });
+    if(nearest) showInfo(nearest);
+  },()=>alert('位置情報を取得できませんでした'));
 }
 
 const LINE_DATA={
@@ -361,7 +525,6 @@ const LINE_DATA={
   }
 };
 
-// 起動時に全路線を展開（バグ修正：初期状態でも全路線を表示できるよう）
 const ALL_LINES={};
 Object.values(LINE_DATA).forEach(lines=>{
   Object.entries(lines).forEach(([l,s])=>{ALL_LINES[l]=s;});
@@ -536,14 +699,19 @@ L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',{
 
 let stationData=STATIONS.map(s=>({...s})),markers=[];
 
-function lsKey(){return 'spcv8_'+document.getElementById('radiusSelect').value;}
+// ── キャッシュ（半径ごとに独立、削除しない） ──
+function lsKey(){return 'spc9_'+document.getElementById('radiusSelect').value;}
 function saveLocal(d){try{localStorage.setItem(lsKey(),JSON.stringify(d));}catch(e){}}
 function loadLocal(){try{const s=localStorage.getItem(lsKey());return s?JSON.parse(s):null;}catch(e){return null;}}
+
 function setStatus(msg,anim){
   const el=document.getElementById('statusbar');
   el.textContent=msg;el.className=anim?'anim':'';
 }
-function closeInfo(){document.getElementById('info-panel').style.display='none';}
+function closeInfo(){
+  document.getElementById('info-panel').style.display='none';
+  currentStation=null;
+}
 
 async function fetchOne(st){
   const r=document.getElementById('radiusSelect').value;
@@ -554,9 +722,10 @@ async function fetchOne(st){
   }catch(e){return{score:0,details:{}};}
 }
 
-async function loadAll(forceRefresh){
+// ── ロード（キャッシュ優先、バックグラウンド更新） ──
+async function loadAll(){
   const cached=loadLocal();
-  if(cached&&!forceRefresh){
+  if(cached){
     stationData=STATIONS.map(st=>{
       const f=cached.find(c=>c.name===st.name&&c.pref===st.pref);
       return f&&f.score?{...st,...f}:{...st,score:null,details:{}};
@@ -595,19 +764,27 @@ async function loadAll(forceRefresh){
   }
 }
 
-function getVisible(){
-  const zoom=lmap.getZoom();
+function getFiltered(){
   const pref=document.getElementById('prefSelect').value;
   const line=document.getElementById('lineSelect').value;
-  let f=stationData.filter(s=>{
+  const rank=document.getElementById('rankFilter').value;
+  const q=(document.getElementById('searchInput').value||'').trim();
+  return stationData.filter(s=>{
     if(!s.score) return false;
     if(pref&&s.pref!==pref) return false;
     if(line&&!s.lines.includes(line)) return false;
+    if(rank&&getRank(s.score).rank!==rank) return false;
+    if(q&&!s.name.includes(q)) return false;
+    if(showFavOnly&&!isFav(s)) return false;
     return true;
   });
+}
+
+function getVisible(){
+  const zoom=lmap.getZoom();
   const base=isPc()?1.0:1.35;
   const d=(zoom>=14?22:zoom>=13?40:zoom>=12?65:zoom>=11?100:150)*base;
-  const sorted=[...f].sort((a,b)=>b.score-a.score);
+  const sorted=[...getFiltered()].sort((a,b)=>b.score-a.score);
   const vis=[];
   for(const st of sorted){
     const p=lmap.latLngToContainerPoint([st.lat,st.lng]);
@@ -640,7 +817,17 @@ function drawMarker(st){
   markers.push(m);
 }
 
+// 近隣駅（直線距離で近い上位3駅）
+function getNearby(st){
+  return stationData
+    .filter(s=>s.score&&(s.name!==st.name||s.pref!==st.pref))
+    .map(s=>({...s,dist:Math.hypot(s.lat-st.lat,s.lng-st.lng)}))
+    .sort((a,b)=>a.dist-b.dist)
+    .slice(0,3);
+}
+
 function showInfo(st){
+  currentStation=st;
   const{rank,color}=getRank(st.score);
   document.getElementById('ip-name').textContent=st.name+'駅';
   document.getElementById('ip-line').textContent=formatLines(st.lines)+' · '+st.pref;
@@ -648,6 +835,21 @@ function showInfo(st){
   sc.textContent=st.score;sc.style.color=color;
   document.getElementById('ip-rank').textContent=rank+'ランク';
   document.getElementById('ip-rank').style.color=color;
+  updateFavBtn(st);
+
+  // 近隣駅
+  const nearby=getNearby(st);
+  document.getElementById('ip-nearby').innerHTML=
+    `<div class="ip-nearby-title">近隣の強い駅</div>`+
+    nearby.map(n=>{
+      const{color:nc}=getRank(n.score);
+      return`<div class="ip-nearby-row">
+        <span class="ip-nearby-name">${n.name}駅</span>
+        <span class="ip-nearby-score" style="color:${nc}">${n.score}pt</span>
+      </div>`;
+    }).join('');
+
+  // 4軸
   const axes=['飲食','商業','生活','医療'];
   const d=st.details||{};
   document.getElementById('ip-axes').innerHTML=axes.map(name=>{
@@ -658,7 +860,7 @@ function showInfo(st){
       <span class="ip-axis-lbl">${name}</span>
       <div class="ip-axis-row">
         <div class="ip-track"><div class="ip-fill" style="width:${pct}%;background:${ac}"></div></div>
-        <span class="ip-pts" style="color:${ac}">${v.pts}<span style="font-size:8px;color:#5060a0">/${v.max}</span></span>
+        <span class="ip-pts" style="color:${ac}">${v.pts}<span style="font-size:8px;color:#405080">/${v.max}</span></span>
       </div>
     </div>`;
   }).join('');
@@ -666,26 +868,46 @@ function showInfo(st){
 }
 
 function updateTable(filtered){
-  const sorted=[...filtered].sort((a,b)=>b.score-a.score);
+  const axis=rankAxis;
+  const sorted=[...filtered].sort((a,b)=>getAxisScore(b)-getAxisScore(a));
+
+  // 路線絞り込み時に平均スコアを表示
+  const line=document.getElementById('lineSelect').value;
+  const avgEl=document.getElementById('rank-avg');
+  if(line&&sorted.length>0){
+    const avg=Math.round(sorted.reduce((s,st)=>s+getAxisScore(st),0)/sorted.length);
+    avgEl.textContent='平均 '+avg+'pt';
+  } else {
+    avgEl.textContent='';
+  }
+
+  // ヘッダーテキスト
+  document.getElementById('rank-header-txt').textContent=
+    axis==='総合'?'ランキング':axis+'ランキング';
+
   const axes=['飲食','商業','生活','医療'];
-  const hdr=isPc()?`<div class="rank-header"><span>ランキング</span><span style="color:#7888b0">${sorted.length}駅</span></div>`:'';
-  document.getElementById('table-area').innerHTML=hdr+sorted.map((st,i)=>{
+  document.getElementById('rank-list').innerHTML=sorted.map((st,i)=>{
     const{rank,color}=getRank(st.score);
     const d=st.details||{};
+    const displayScore=axis==='総合'?st.score:getAxisScore(st);
     const cats=axes.map(n=>{
       const v=d[n]||{pts:0};
       return`<span class="rcat" style="background:${AC[n]}1a;color:${AC[n]};border:1px solid ${AC[n]}33">${n} ${v.pts}</span>`;
     }).join('');
+    const favIcon=isFav(st)?'♥':'♡';
     const rnCls=i<3?'rn top3':'rn';
     return`<div class="rank-row" onclick="onTableClick('${st.name}','${st.pref}')">
       <span class="${rnCls}">${i+1}</span>
       <div class="rbadge" style="background:${color}1a;border:1.5px solid ${color};color:${color}">${rank}</div>
       <div class="rinfo">
-        <div class="rname">${st.name}駅</div>
+        <div class="rname-row">
+          <span class="rname">${st.name}駅</span>
+          <span class="rfav" onclick="event.stopPropagation();toggleFav(stationData.find(s=>s.name==='${st.name}'&&s.pref==='${st.pref}'))">${favIcon}</span>
+        </div>
         <div class="rline">${formatLines(st.lines)} · ${st.pref}</div>
         <div class="rcats">${cats}</div>
       </div>
-      <span class="rscore" style="color:${color}">${st.score}</span>
+      <span class="rscore" style="color:${color}">${displayScore}</span>
     </div>`;
   }).join('');
 }
@@ -698,7 +920,6 @@ function onTableClick(name,pref){
   showInfo(st);
 }
 
-// バグ修正：初期状態でも全路線を表示
 function initLineSelect(){
   const ls=document.getElementById('lineSelect');
   ls.innerHTML='<option value="">全路線</option>';
@@ -726,14 +947,7 @@ function render(){
   markers.forEach(m=>lmap.removeLayer(m));markers=[];
   closeInfo();
   getVisible().forEach(drawMarker);
-  const pref=document.getElementById('prefSelect').value;
-  const line=document.getElementById('lineSelect').value;
-  updateTable(stationData.filter(s=>{
-    if(!s.score) return false;
-    if(pref&&s.pref!==pref) return false;
-    if(line&&!s.lines.includes(line)) return false;
-    return true;
-  }));
+  updateTable(getFiltered());
 }
 
 function setView(v){
@@ -757,20 +971,20 @@ function closeModal(){document.getElementById('modal-bg').classList.remove('open
 
 lmap.on('movestart',closeInfo);
 lmap.on('zoomend moveend',()=>{if(stationData.some(s=>s.score)) render();});
+
+// ── 半径変更：キャッシュがあれば即表示（削除しない） ──
 document.getElementById('radiusSelect').addEventListener('change',()=>{
-  localStorage.removeItem(lsKey());
-  loadAll(true);
+  loadAll();
 });
 
 if(isPc()){
   document.getElementById('btnMap').style.display='none';
   document.getElementById('btnTable').style.display='none';
-  document.getElementById('table-area').style.display='block';
+  document.getElementById('table-area').style.display='flex';
 }
 
-// 路線リストを初期化してからロード
 initLineSelect();
-loadAll(false);
+loadAll();
 </script>
 </body>
 </html>
