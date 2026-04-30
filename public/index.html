@@ -925,8 +925,8 @@ const COORDS_DATA={
 };
 
 const STATIONS=Object.values(STATIONS_MAP)
-  .filter(s=>COORDS_DATA[s.name])
-  .map(s=>({...s,lat:COORDS_DATA[s.name][0],lng:COORDS_DATA[s.name][1],score:null,details:{}}));
+  .filter(s=>COORDS[s.name])
+  .map(s=>({...s,lat:COORDS[s.name][0],lng:COORDS[s.name][1],score:null,details:{}}));
 
 const isPc=()=>window.innerWidth>=768;
 
