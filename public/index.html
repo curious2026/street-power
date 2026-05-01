@@ -6,62 +6,78 @@
 <title>街の戦闘力</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;700;900&family=Zen+Kaku+Gothic+New:wght@900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;700;900&family=Zen+Antique+Soft&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;background:#050810;color:#d8e0f0;font-family:'Inter','Noto Sans JP',sans-serif}
 #app{display:flex;flex-direction:column;height:100vh}
+
+/* ── ヘッダー ── */
 #header{
-  display:flex;align-items:center;padding:0 12px;height:56px;flex-shrink:0;
-  gap:8px;z-index:2000;position:relative;overflow:hidden;
+  display:flex;align-items:center;padding:0 12px;
+  height:60px;flex-shrink:0;gap:8px;z-index:2000;position:relative;overflow:visible;
   background:linear-gradient(180deg,#3a3e52 0%,#21253a 8%,#141726 25%,#0d1020 55%,#090c18 100%);
   border-bottom:1px solid rgba(180,200,230,0.18);
   box-shadow:inset 0 1px 0 rgba(255,255,255,0.14),inset 0 -1px 0 rgba(0,0,0,0.4),0 3px 18px rgba(0,0,0,0.6)
 }
 #header::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
   background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3) 30%,rgba(255,255,255,0.5) 50%,rgba(255,255,255,0.3) 70%,transparent)}
-.logo{display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0}
+
+/* タイトル：確定デザイン */
+.logo-wrap{
+  position:relative;flex-shrink:0;cursor:pointer;
+  padding:5px 14px 13px;
+  background:#07091a;
+  border-radius:8px;
+  border:1px solid #1a2448;
+}
+.logo-wrap::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1.5px;border-radius:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,136,68,0.9) 28%,rgba(102,136,255,0.9) 72%,transparent)
+}
 .logo-main{
-  font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif;
-  font-size:24px;font-weight:900;letter-spacing:3px;white-space:nowrap;
+  font-family:'Zen Antique Soft',serif;
+  font-size:22px;font-weight:400;letter-spacing:5px;white-space:nowrap;display:block;
   background:linear-gradient(110deg,#ff4422 0%,#ff7733 18%,#ffcc33 40%,#ffffff 55%,#e8f0ff 65%,#99bbff 82%,#5588ff 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 0 16px rgba(255,120,50,0.5)) drop-shadow(0 2px 3px rgba(0,0,0,0.9))
+  filter:drop-shadow(0 0 14px rgba(255,120,50,0.45)) drop-shadow(0 2px 3px rgba(0,0,0,0.9))
 }
-/* スマホ：半径セレクトをタイトル横に */
-#mobile-radius{
-  display:none;
-  background:rgba(8,12,26,0.8);color:#c8d6f0;
-  border:1px solid rgba(120,150,210,0.28);
-  padding:4px 6px;border-radius:7px;font-size:11px;
-  cursor:pointer;outline:none;font-family:inherit;font-weight:600;
-  margin-left:6px
-}
-@media(max-width:767px){#mobile-radius{display:block}}
-#header-controls{display:flex;flex-direction:column;align-items:flex-end;gap:3px;margin-left:auto}
-.hc-top,.hc-bot{display:flex;align-items:center;gap:5px}
-@media(min-width:768px){
-  #header-controls{flex-direction:row;align-items:center;gap:8px;margin-left:10px}
-  #btnMap,#btnTable{display:none!important}
-}
-@media(max-width:767px){.hc-bot{display:none!important}}
+.logo-lines{position:absolute;bottom:5px;left:10%;right:10%}
+.logo-line-main{height:5px;border-radius:2.5px;background:linear-gradient(90deg,transparent,rgba(255,136,68,0.95) 28%,rgba(102,136,255,0.95) 72%,transparent)}
+.logo-line-f1{height:2px;border-radius:1px;margin-top:2px;width:80%;margin-left:10%;background:linear-gradient(90deg,transparent,rgba(255,136,68,0.38) 28%,rgba(102,136,255,0.38) 72%,transparent)}
+.logo-line-f2{height:1px;border-radius:0.5px;margin-top:2px;width:55%;margin-left:22.5%;background:linear-gradient(90deg,transparent,rgba(255,136,68,0.15) 28%,rgba(102,136,255,0.15) 72%,transparent)}
+
+/* ヘッダー右側 */
+#header-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+#header-left-col{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
 .info-btn{font-size:10px;color:#b0c4ff;font-weight:700;border:1px solid rgba(120,160,255,0.3);
   padding:4px 9px;border-radius:16px;cursor:pointer;white-space:nowrap;
-  background:rgba(80,110,255,0.08);transition:all 0.2s;font-family:inherit}
+  background:rgba(80,110,255,0.08);font-family:inherit}
 .info-btn:hover{border-color:rgba(160,200,255,0.55);color:#d8eaff}
 .hsel{background:rgba(8,12,26,0.8);color:#c8d6f0;border:1px solid rgba(120,150,210,0.28);
-  padding:5px 7px;border-radius:7px;font-size:11px;cursor:pointer;outline:none;font-family:inherit;font-weight:600}
-/* スマホ：タブボタン（大きく・ラベル付き） */
-.view-tabs{display:flex;border:1px solid rgba(120,150,210,0.22);border-radius:8px;overflow:hidden}
+  padding:4px 7px;border-radius:7px;font-size:11px;cursor:pointer;outline:none;font-family:inherit;font-weight:600}
+.view-tabs{display:flex;border:1px solid rgba(120,150,210,0.22);border-radius:8px;overflow:hidden;flex-shrink:0}
 .vtab{background:transparent;color:#4858a0;border:none;padding:4px 10px;cursor:pointer;
   transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:1px;font-family:inherit}
-.vtab-icon{font-size:22px;line-height:1}
+.vtab-icon{font-size:20px;line-height:1}
 .vtab-label{font-size:9px;font-weight:700;letter-spacing:0.5px;line-height:1;color:#4858a0}
 .vtab.active{background:rgba(70,100,220,0.28)}
 .vtab.active .vtab-icon,.vtab.active .vtab-label{color:#e0eaff}
 .vtab:hover:not(.active) .vtab-icon,.vtab:hover:not(.active) .vtab-label{color:#a0b8e0}
 
+/* PC */
+@media(min-width:768px){
+  #header{height:56px}
+  #header-left-col{flex-direction:row;align-items:center;gap:8px}
+  .view-tabs{display:none}
+}
+/* スマホ */
+@media(max-width:767px){
+  #header{height:64px}
+}
+
+/* ── フィルターバー ── */
 #filters{display:flex;align-items:center;gap:4px;padding:4px 10px;
   background:#050810;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;overflow-x:auto}
 .fsel{background:rgba(255,255,255,0.05);color:#c8d6f0;border:1px solid rgba(120,150,210,0.2);
@@ -80,12 +96,13 @@ html,body{height:100%;background:#050810;color:#d8e0f0;font-family:'Inter','Noto
 #statusbar.anim{color:#5a90ff;animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:0.35}50%{opacity:1}}
 
+/* ── コンテンツ ── */
 #content{flex:1;position:relative;overflow:hidden;display:flex}
 #map-area{position:relative;flex:1;min-width:0;overflow:hidden}
 #leaflet-map{width:100%;height:100%}
 .leaflet-container{background:#e8e8e8!important}
-/* ★ 地図をダーク化 */
-.leaflet-tile-pane{filter:brightness(0.52) saturate(0.5) contrast(1.05)}
+/* ★ 中間の明るさ */
+.leaflet-tile-pane{filter:brightness(0.72) saturate(0.6)}
 .leaflet-control-zoom{margin:12px!important}
 .leaflet-control-zoom a{background:#fff!important;color:#555!important;
   border-color:rgba(0,0,0,0.15)!important;width:28px!important;height:28px!important;line-height:28px!important;font-size:15px!important}
@@ -105,7 +122,6 @@ html,body{height:100%;background:#050810;color:#d8e0f0;font-family:'Inter','Noto
   color:#444;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
   box-shadow:0 2px 6px rgba(0,0,0,0.15)}
 
-/* ★ 凡例パネル：bottom:46px でボタンと被らない */
 #legend-toggle{position:absolute;bottom:10px;left:10px;z-index:1001;
   background:rgba(4,7,18,0.9);border:1px solid rgba(255,255,255,0.15);
   border-radius:8px;color:#9098c8;padding:5px 9px;cursor:pointer;
@@ -123,6 +139,7 @@ html,body{height:100%;background:#050810;color:#d8e0f0;font-family:'Inter','Noto
 .leg-item{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px;color:#a0b0d0;font-weight:600}
 .leg-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
 
+/* 詳細パネル */
 #info-panel{position:absolute;bottom:8px;right:8px;z-index:1001;
   background:rgba(4,7,20,0.97);border:1px solid rgba(255,255,255,0.12);
   border-radius:13px;padding:14px;min-width:215px;max-width:255px;
@@ -163,6 +180,23 @@ html,body{height:100%;background:#050810;color:#d8e0f0;font-family:'Inter','Noto
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes selPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
 
+/* DEV MODE */
+#dev-badge{display:none;position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  background:#ff3355;color:#fff;padding:3px 14px;border-radius:12px;
+  font-size:11px;font-weight:700;z-index:1000;letter-spacing:1.5px;
+  box-shadow:0 2px 10px rgba(255,50,80,0.5)}
+#dev-overlay{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:#08101e;border:2px solid #4466ff;border-radius:14px;padding:20px;
+  z-index:9999;min-width:300px;box-shadow:0 20px 60px rgba(0,0,0,0.95)}
+.dev-head{font-size:10px;color:#4458a0;margin-bottom:8px;letter-spacing:2px;font-weight:700}
+.dev-station{font-size:16px;font-weight:700;margin-bottom:10px;color:#fff}
+.dev-code{background:#040810;padding:10px;border-radius:8px;margin-bottom:12px;
+  color:#88ccff;font-size:12px;font-family:monospace;word-break:break-all;line-height:1.6}
+.dev-btns{display:flex;gap:8px}
+.dev-copy{flex:1;background:#4466ff;border:none;color:#fff;padding:9px;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;font-family:inherit}
+.dev-close{flex:1;background:#101828;border:1px solid #2a3860;color:#7080b0;padding:9px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit}
+
+/* ランキング */
 #rank-tabs{display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;background:#050810}
 .rank-tab{background:transparent;border:none;color:#5060a0;padding:9px 11px;font-size:12px;cursor:pointer;
   transition:all 0.15s;white-space:nowrap;font-family:inherit;font-weight:700;
@@ -180,8 +214,7 @@ html,body{height:100%;background:#050810;color:#d8e0f0;font-family:'Inter','Noto
 .rank-row{display:flex;align-items:flex-start;gap:8px;padding:8px 14px 7px;
   border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.12s}
 .rank-row:hover{background:rgba(255,255,255,0.04)}
-.rank-left{display:flex;flex-direction:column;align-items:center;width:22px;flex-shrink:0;padding-top:1px;gap:0}
-/* ★ 順位数字：サイズアップ・クリアな白 */
+.rank-left{display:flex;flex-direction:column;align-items:center;width:22px;flex-shrink:0;padding-top:1px}
 .rn{font-size:18px;font-weight:900;color:#e8eeff;font-variant-numeric:tabular-nums;line-height:1.2}
 .rn.top3{color:#ffffff;font-size:20px;text-shadow:0 0 8px rgba(180,200,255,0.5)}
 .rletter{font-size:15px;font-weight:900;line-height:1.1}
@@ -197,6 +230,7 @@ html,body{height:100%;background:#050810;color:#d8e0f0;font-family:'Inter','Noto
 .rcat{font-size:9px;padding:2px 5px;border-radius:3px;font-weight:700;white-space:nowrap;flex-shrink:0}
 .rscore{font-size:23px;font-weight:900;flex-shrink:0;letter-spacing:-0.5px;font-variant-numeric:tabular-nums;min-width:46px;text-align:right;padding-top:1px}
 
+/* モーダル */
 #modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.87);z-index:5000;
   display:none;align-items:center;justify-content:center;backdrop-filter:blur(7px)}
 #modal-bg.open{display:flex}
@@ -222,35 +256,36 @@ html,body{height:100%;background:#050810;color:#d8e0f0;font-family:'Inter','Noto
 <body>
 <div id="app">
   <div id="header">
-    <div class="logo" onclick="openModal()"><span class="logo-main">街の戦闘力</span></div>
-    <select id="mobile-radius" onchange="onMobileRadiusChange()">
-      <option value="500" selected>500m</option>
-      <option value="800">800m</option>
-      <option value="1200">1,200m</option>
-    </select>
-    <div id="header-controls">
-      <div class="hc-top">
-        <button class="info-btn" onclick="openModal()">スコアの見方 ⓘ</button>
-        <div class="view-tabs">
-          <button class="vtab active" id="btnMap" onclick="setView('map')">
-            <span class="vtab-icon">🗺</span>
-            <span class="vtab-label">MAP</span>
-          </button>
-          <button class="vtab" id="btnTable" onclick="setView('table')">
-            <span class="vtab-icon">📊</span>
-            <span class="vtab-label">RANK</span>
-          </button>
-        </div>
+    <div class="logo-wrap" onclick="openModal()">
+      <span class="logo-main">街の戦闘力</span>
+      <div class="logo-lines">
+        <div class="logo-line-main"></div>
+        <div class="logo-line-f1"></div>
+        <div class="logo-line-f2"></div>
       </div>
-      <div class="hc-bot">
+    </div>
+    <div id="header-right">
+      <div id="header-left-col">
+        <button class="info-btn" onclick="openModal()">スコアの見方 ⓘ</button>
         <select class="hsel" id="radiusSelect" onchange="onRadiusChange()">
           <option value="500" selected>半径 500m</option>
           <option value="800">半径 800m</option>
           <option value="1200">半径 1,200m</option>
         </select>
       </div>
+      <div class="view-tabs">
+        <button class="vtab active" id="btnMap" onclick="setView('map')">
+          <span class="vtab-icon">🗺</span>
+          <span class="vtab-label">MAP</span>
+        </button>
+        <button class="vtab" id="btnTable" onclick="setView('table')">
+          <span class="vtab-icon">📊</span>
+          <span class="vtab-label">RANK</span>
+        </button>
+      </div>
     </div>
   </div>
+
   <div id="filters">
     <select class="fsel" id="prefSelect" onchange="onPrefChange()">
       <option value="">全エリア</option>
@@ -269,10 +304,12 @@ html,body{height:100%;background:#050810;color:#d8e0f0;font-family:'Inter','Noto
     <input type="text" id="searchInput" placeholder="駅名・路線名..." oninput="render()">
     <span id="statusbar"></span>
   </div>
+
   <div id="content">
     <div id="map-area">
       <div id="leaflet-map"></div>
       <button id="gpsBtn" onclick="gotoCurrentLocation()">📍</button>
+      <div id="dev-badge">⚡ DEV MODE</div>
       <button id="legend-toggle" onclick="toggleLegend()">ランク表示</button>
       <div id="legend">
         <div class="leg-title">戦闘力ランク</div>
@@ -316,6 +353,17 @@ html,body{height:100%;background:#050810;color:#d8e0f0;font-family:'Inter','Noto
   </div>
 </div>
 
+<!-- DEV MODE オーバーレイ -->
+<div id="dev-overlay">
+  <div class="dev-head">⚡ DEV MODE — 座標修正</div>
+  <div class="dev-station" id="dev-name"></div>
+  <div class="dev-code" id="dev-code"></div>
+  <div class="dev-btns">
+    <button class="dev-copy" onclick="copyDevCoords()">📋 コピー</button>
+    <button class="dev-close" onclick="document.getElementById('dev-overlay').style.display='none'">✕ 閉じる</button>
+  </div>
+</div>
+
 <div id="modal-bg" onclick="closeModal()">
   <div id="modal" onclick="event.stopPropagation()">
     <div class="modal-hdr"><div class="modal-title">戦闘力スコアの算出方法</div><button class="modal-x" onclick="closeModal()">✕</button></div>
@@ -330,6 +378,39 @@ html,body{height:100%;background:#050810;color:#d8e0f0;font-family:'Inter','Noto
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+// ═══════════════════════════════════════
+// Favicon（ビルアイコン）
+// ═══════════════════════════════════════
+(function(){
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#030810"/><rect x="3" y="16" width="5" height="14" fill="#1a40cc" stroke="#5588ff" stroke-width="0.8"/><rect x="9" y="10" width="8" height="20" fill="#1533bb" stroke="#77bbff" stroke-width="1"/><rect x="10" y="12" width="2" height="2" fill="#99eeff"/><rect x="13" y="12" width="2" height="2" fill="#55bbff"/><rect x="10" y="17" width="2" height="2" fill="#55bbff"/><rect x="13" y="17" width="2" height="2" fill="#99eeff"/><rect x="18" y="12" width="7" height="18" fill="#1a3ecc" stroke="#6699ff" stroke-width="0.8"/><rect x="19" y="14" width="2" height="2" fill="#88ccff"/><rect x="22" y="14" width="2" height="2" fill="#55aaff"/><rect x="3" y="29" width="26" height="1.5" fill="#3366ff"/><text x="30" y="9" font-family="Arial" font-size="8" font-weight="900" fill="#ffd700" text-anchor="end">1000</text></svg>`;
+  const link=document.createElement('link');
+  link.rel='icon';link.type='image/svg+xml';
+  link.href='data:image/svg+xml,'+encodeURIComponent(svg);
+  document.head.appendChild(link);
+})();
+
+// ═══════════════════════════════════════
+// DEV MODE
+// ═══════════════════════════════════════
+const DEV_MODE=new URLSearchParams(window.location.search).get('dev')==='1';
+if(DEV_MODE){
+  document.getElementById('dev-badge').style.display='block';
+  document.body.style.outline='3px solid #ff3355';
+}
+function showDevOverlay(name,lat,lng){
+  document.getElementById('dev-name').textContent=name+'駅';
+  document.getElementById('dev-code').textContent=`'${name}':[${lat.toFixed(4)},${lng.toFixed(4)}]`;
+  document.getElementById('dev-overlay').style.display='block';
+}
+function copyDevCoords(){
+  const txt=document.getElementById('dev-code').textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=document.querySelector('.dev-copy');
+    btn.textContent='✅ コピー完了！';
+    setTimeout(()=>btn.textContent='📋 コピー',2000);
+  });
+}
+
 // ═══════════════════════════════════════
 // 定数・ユーティリティ
 // ═══════════════════════════════════════
@@ -350,6 +431,7 @@ function formatLinesDisplay(lines){
   if(c.length===2)return c.join(' / ');
   return c.slice(0,2).join(' / ')+' ほか';
 }
+const isPc=()=>window.innerWidth>=768;
 
 const LINE_ORDER=[
   '山手線','京浜東北線','中央線','総武線','東海道線','常磐線','常磐線各駅停車','埼京線','京葉線',
@@ -392,9 +474,6 @@ function toggleFavFilter(){
   document.getElementById('favFilter').classList.toggle('on',showFavOnly);render();
 }
 
-// ═══════════════════════════════════════
-// シェア・ランキング
-// ═══════════════════════════════════════
 let currentStation=null;
 function shareStation(){
   if(!currentStation)return;
@@ -417,9 +496,6 @@ function getAxisScore(st){
   return(st.details&&st.details[rankAxis])?st.details[rankAxis].pts:0;
 }
 
-// ═══════════════════════════════════════
-// 凡例・GPS
-// ═══════════════════════════════════════
 let legendVisible=false;
 function toggleLegend(){
   legendVisible=!legendVisible;
@@ -447,26 +523,11 @@ function gotoCurrentLocation(){
   },()=>alert('位置情報を取得できませんでした'));
 }
 
-// ═══════════════════════════════════════
-// 半径（PC・スマホ同期）
-// ═══════════════════════════════════════
-const isPc=()=>window.innerWidth>=768;
-function getRadius(){
-  return isPc()
-    ?document.getElementById('radiusSelect').value
-    :document.getElementById('mobile-radius').value;
-}
-function onRadiusChange(){
-  document.getElementById('mobile-radius').value=document.getElementById('radiusSelect').value;
-  loadAll();
-}
-function onMobileRadiusChange(){
-  document.getElementById('radiusSelect').value=document.getElementById('mobile-radius').value;
-  loadAll();
-}
+function getRadius(){return document.getElementById('radiusSelect').value;}
+function onRadiusChange(){loadAll();}
 
 // ═══════════════════════════════════════
-// 路線・駅データ（1回だけ定義）
+// 路線・駅データ（重複なし・1回のみ）
 // ═══════════════════════════════════════
 const LINE_DATA={
   '東京都':{
@@ -527,7 +588,6 @@ const LINE_DATA={
   }
 };
 
-// ALL_LINES・STATIONS_MAP（1回だけ）
 const ALL_LINES={};
 Object.values(LINE_DATA).forEach(lines=>{Object.entries(lines).forEach(([l,s])=>{ALL_LINES[l]=s;});});
 const STATIONS_MAP={};
@@ -541,7 +601,6 @@ Object.entries(LINE_DATA).forEach(([pref,lines])=>{
   });
 });
 
-// 座標（1回だけ）
 const COORDS={
   '新宿':[35.6896,139.7006],'渋谷':[35.6580,139.7016],'池袋':[35.7295,139.7109],
   '東京':[35.6812,139.7671],'品川':[35.6284,139.7387],'上野':[35.7141,139.7774],
@@ -729,9 +788,7 @@ const COORDS={
   '南町田グランベリーパーク':[35.5241,139.4620],'つきみ野':[35.5205,139.4578]
 };
 
-// ═══════════════════════════════════════
-// STATIONSはCOORDSを使って1回だけ定義
-// ═══════════════════════════════════════
+// STATIONSはCOORDSを参照（重複なし）
 const STATIONS=Object.values(STATIONS_MAP)
   .filter(s=>COORDS[s.name])
   .map(s=>({...s,lat:COORDS[s.name][0],lng:COORDS[s.name][1],score:null,details:{}}));
@@ -749,7 +806,7 @@ let stationData=STATIONS.map(s=>({...s})),markers=[];
 let selectedMarkerInner=null;
 
 // ═══════════════════════════════════════
-// キャッシュ（キー固定）
+// キャッシュ
 // ═══════════════════════════════════════
 function lsKey(){return 'spc_stable_v1_'+getRadius();}
 function saveLocal(d){try{localStorage.setItem(lsKey(),JSON.stringify(d));}catch(e){}}
@@ -768,9 +825,8 @@ function closeInfo(){
 }
 
 async function fetchOne(st){
-  const r=getRadius();
   try{
-    const res=await fetch('/api/score?ll='+st.lat+','+st.lng+'&radius='+r);
+    const res=await fetch('/api/score?ll='+st.lat+','+st.lng+'&radius='+getRadius());
     if(!res.ok)throw new Error();
     return await res.json();
   }catch(e){return{score:0,details:{}};}
@@ -863,8 +919,17 @@ function drawMarker(st){
       margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.9);font-weight:700">${st.name}</span>
   </div>`;
   const icon=L.divIcon({className:'',html,iconSize:[sz+64,sz+20],iconAnchor:[(sz+64)/2,sz/2]});
-  const m=L.marker([st.lat,st.lng],{icon}).addTo(lmap);
+  const m=L.marker([st.lat,st.lng],{icon,draggable:DEV_MODE}).addTo(lmap);
   m._st=st;m._color=color;m._glow=glow;m._glowPx=glowPx;
+
+  // DEV MODE: ドラッグで座標修正
+  if(DEV_MODE){
+    m.on('dragend',()=>{
+      const pos=m.getLatLng();
+      showDevOverlay(st.name,pos.lat,pos.lng);
+    });
+  }
+
   m.on('click',()=>{
     if(selectedMarkerInner){
       selectedMarkerInner.style.animation='';
@@ -938,7 +1003,7 @@ function updateTable(filtered){
   if(line&&sorted.length>0){
     const avg=Math.round(sorted.reduce((s,st)=>s+getAxisScore(st),0)/sorted.length);
     avgEl.textContent='平均 '+avg+'pt';
-  }else{avgEl.textContent='';}
+  } else{avgEl.textContent='';}
   document.getElementById('rank-header-txt').textContent=rankAxis==='総合'?'ランキング':rankAxis+'ランキング';
   const axes=['飲食','商業','生活','医療'];
   document.getElementById('rank-list').innerHTML=sorted.map((st,i)=>{
@@ -1015,10 +1080,8 @@ lmap.on('movestart',closeInfo);
 lmap.on('zoomend moveend',()=>{if(stationData.some(s=>s.score))render();});
 
 if(isPc()){
-  document.getElementById('btnMap').style.display='none';
-  document.getElementById('btnTable').style.display='none';
   document.getElementById('table-area').style.display='flex';
-  document.getElementById('mobile-radius').style.display='none';
+  document.querySelector('.view-tabs').style.display='none';
 }
 
 initLineSelect();
