@@ -809,8 +809,17 @@ let selectedMarkerInner=null;
 // キャッシュ
 // ═══════════════════════════════════════
 function lsKey(){return 'spc_stable_v1_'+getRadius();}
-function saveLocal(d){try{localStorage.setItem(lsKey(),JSON.stringify(d));}catch(e){}}
-function loadLocal(){try{const s=localStorage.getItem(lsKey());return s?JSON.parse(s):null;}catch(e){return null;}}
+function saveLocal(d){
+  try{localStorage.setItem(lsKey(),JSON.stringify({data:d,ts:Date.now()}));}catch(e){}
+}
+function loadLocal(){
+  try{
+    const s=localStorage.getItem(lsKey());
+    if(!s) return null;
+    const p=JSON.parse(s);
+    return Array.isArray(p)?{data:p,ts:0}:p;
+  }catch(e){return null;}
+}
 
 function setStatus(msg,anim){const el=document.getElementById('statusbar');el.textContent=msg;el.className=anim?'anim':'';}
 function closeInfo(){
@@ -833,15 +842,21 @@ async function fetchOne(st){
 }
 
 async function loadAll(){
+  const CACHE_TTL=6*60*60*1000;
   const cached=loadLocal();
-  if(cached){
+  if(cached&&cached.data){
     stationData=STATIONS.map(st=>{
-      const f=cached.find(c=>c.name===st.name&&c.pref===st.pref);
+      const f=cached.data.find(c=>c.name===st.name&&c.pref===st.pref);
       return f&&f.score?{...st,...f}:{...st,score:null,details:{}};
     });
     document.getElementById('loading').classList.remove('show');
     render();
-    setStatus(stationData.filter(s=>s.score).length+'駅（更新中）',true);
+    const age=Date.now()-(cached.ts||0);
+    if(age<CACHE_TTL){
+      setStatus(stationData.filter(s=>s.score).length+'駅表示中',false);
+      return;
+    }
+    setStatus('バックグラウンド更新中...',true);
     let n=0;
     for(let i=0;i<STATIONS.length;i+=5){
       await Promise.all(STATIONS.slice(i,i+5).map(async st=>{
@@ -849,14 +864,15 @@ async function loadAll(){
         const idx=stationData.findIndex(s=>s.name===st.name&&s.pref===st.pref);
         if(idx>=0){stationData[idx]={...stationData[idx],...d};n++;}
       }));
-      if(!DEV_MODE)render();setStatus(n+'/'+STATIONS.length+' 更新中...',true);
+      setStatus(n+'/'+STATIONS.length+' 更新中...',true);
     }
     saveLocal(stationData);
+    if(!DEV_MODE)render();
     setStatus(stationData.filter(s=>s.score>0).length+'駅表示中',false);
   } else {
     stationData=STATIONS.map(s=>({...s,score:null,details:{}}));
     document.getElementById('loading').classList.add('show');
-    setStatus('取得中...',true);
+    setStatus('初回取得中...',true);
     let done=0;
     for(let i=0;i<STATIONS.length;i+=5){
       await Promise.all(STATIONS.slice(i,i+5).map(async st=>{
@@ -866,9 +882,10 @@ async function loadAll(){
         done++;
       }));
       if(done>=10)document.getElementById('loading').classList.remove('show');
-      if(!DEV_MODE)render();setStatus(done+'/'+STATIONS.length+' 取得中...',true);
+      setStatus(done+'/'+STATIONS.length+' 取得中...',true);
     }
     saveLocal(stationData);
+    render();
     setStatus(stationData.filter(s=>s.score>0).length+'駅表示中',false);
   }
 }
