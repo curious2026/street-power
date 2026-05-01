@@ -399,7 +399,9 @@ if(DEV_MODE){
 }
 function showDevOverlay(name,lat,lng){
   document.getElementById('dev-name').textContent=name+'駅';
-  document.getElementById('dev-code').textContent=`'${name}':[${lat.toFixed(4)},${lng.toFixed(4)}]`;
+  const devFixes=JSON.parse(localStorage.getItem('spc_dev_fixes')||'{}');
+const allFixes=Object.entries(devFixes).map(([n,[la,ln]])=>`'${n}':[${la},${ln}]`).join(',\n');
+document.getElementById('dev-code').textContent=`// 最新修正\n'${name}':[${lat.toFixed(4)},${lng.toFixed(4)}]\n\n// 全修正済み座標（${Object.keys(devFixes).length}件）\n${allFixes}`;
   document.getElementById('dev-overlay').style.display='block';
 }
 function copyDevCoords(){
@@ -954,6 +956,14 @@ function drawMarker(st){
     });
   }
 
+  // DEV MODE起動時：保存済み修正を復元
+if(DEV_MODE){
+  const devFixes=JSON.parse(localStorage.getItem('spc_dev_fixes')||'{}');
+  Object.entries(devFixes).forEach(([name,[lat,lng]])=>{
+    if(COORDS[name]){COORDS[name]=[lat,lng];}
+  });
+}
+  
   m.on('click',()=>{
     if(selectedMarkerInner){
       selectedMarkerInner.style.animation='';
