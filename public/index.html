@@ -947,6 +947,9 @@ function drawMarker(st){
       if(idx>=0){stationData[idx].lat=pos.lat;stationData[idx].lng=pos.lng;}
       const si=STATIONS.findIndex(s=>s.name===st.name&&s.pref===st.pref);
       if(si>=0){STATIONS[si].lat=pos.lat;STATIONS[si].lng=pos.lng;}
+      const devFixes=JSON.parse(localStorage.getItem('spc_dev_fixes')||'{}');
+      devFixes[st.name]=[parseFloat(pos.lat.toFixed(4)),parseFloat(pos.lng.toFixed(4))];
+      localStorage.setItem('spc_dev_fixes',JSON.stringify(devFixes));
       showDevOverlay(st.name,pos.lat,pos.lng);
     });
   }
