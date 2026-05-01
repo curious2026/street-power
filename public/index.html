@@ -940,9 +940,13 @@ function drawMarker(st){
   m._st=st;m._color=color;m._glow=glow;m._glowPx=glowPx;
 
   // DEV MODE: ドラッグで座標修正
-  if(DEV_MODE){
+ if(DEV_MODE){
     m.on('dragend',()=>{
       const pos=m.getLatLng();
+      const idx=stationData.findIndex(s=>s.name===st.name&&s.pref===st.pref);
+      if(idx>=0){stationData[idx].lat=pos.lat;stationData[idx].lng=pos.lng;}
+      const si=STATIONS.findIndex(s=>s.name===st.name&&s.pref===st.pref);
+      if(si>=0){STATIONS[si].lat=pos.lat;STATIONS[si].lng=pos.lng;}
       showDevOverlay(st.name,pos.lat,pos.lng);
     });
   }
