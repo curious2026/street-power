@@ -866,7 +866,7 @@ async function loadAll(){
         done++;
       }));
       if(done>=10)document.getElementById('loading').classList.remove('show');
-      render();setStatus(done+'/'+STATIONS.length+' 取得中...',true);
+      if(!DEV_MODE)render();setStatus(done+'/'+STATIONS.length+' 取得中...',true);
     }
     saveLocal(stationData);
     setStatus(stationData.filter(s=>s.score>0).length+'駅表示中',false);
