@@ -849,7 +849,7 @@ async function loadAll(){
         const idx=stationData.findIndex(s=>s.name===st.name&&s.pref===st.pref);
         if(idx>=0){stationData[idx]={...stationData[idx],...d};n++;}
       }));
-      render();setStatus(n+'/'+STATIONS.length+' 更新中...',true);
+      if(!DEV_MODE)render();setStatus(n+'/'+STATIONS.length+' 更新中...',true);
     }
     saveLocal(stationData);
     setStatus(stationData.filter(s=>s.score>0).length+'駅表示中',false);
@@ -1077,7 +1077,7 @@ function openModal(){document.getElementById('modal-bg').classList.add('open');}
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
 
 lmap.on('movestart',closeInfo);
-lmap.on('zoomend moveend',()=>{if(stationData.some(s=>s.score))render();});
+lmap.on('zoomend moveend',()=>{if(stationData.some(s=>s.score)&&!DEV_MODE)render();});
 
 if(isPc()){
   document.getElementById('table-area').style.display='flex';
