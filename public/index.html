@@ -884,8 +884,38 @@ async function loadAll(){
     });
     document.getElementById('loading').classList.remove('show');
     render();
+
+    // ★ 座標が変わった駅を優先的に再取得
+    const movedStations=STATIONS.filter(st=>{
+      const f=cached.data.find(c=>c.name===st.name&&c.pref===st.pref);
+      if(!f) return true;
+      return Math.abs(f.lat-st.lat)>0.0001||Math.abs(f.lng-st.lng)>0.0001;
+    });
+    if(movedStations.length>0){
+      setStatus('座標更新中 '+movedStations.length+'駅...',true);
+      for(let i=0;i<movedStations.length;i+=5){
+        await Promise.all(movedStations.slice(i,i+5).map(async st=>{
+          const d=await fetchOne(st);
+          const idx=stationData.findIndex(s=>s.name===st.name&&s.pref===st.pref);
+          if(idx>=0){stationData[idx]={...stationData[idx],...d,lat:st.lat,lng:st.lng};}
+        }));
+        if(!DEV_MODE)render();
+      }
+      saveLocal(stationData);
+    }
+
+    // 6時間以内ならここで終了
     const age=Date.now()-(cached.ts||0);
-    if(age<CACHE_TTL){setStatus(stationData.filter(s=>s.score).length+'駅表示中',false);return;}
+    if(age<CACHE_TTL&&movedStations.length===0){
+      setStatus(stationData.filter(s=>s.score).length+'駅表示中',false);
+      return;
+    }
+    if(age<CACHE_TTL){
+      setStatus(stationData.filter(s=>s.score).length+'駅表示中',false);
+      return;
+    }
+
+    // 6時間超：全駅バックグラウンド更新
     setStatus('バックグラウンド更新中...',true);
     let n=0;
     for(let i=0;i<STATIONS.length;i+=5){
